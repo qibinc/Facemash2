@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(include)
 
-set(SOURCE_FILES source/TestUtility.cpp include/TestUtility.h)
+set(SOURCE_FILES)
 
-add_library(utilitieslib STATIC ${SOURCE_FILES})
+if (NOT TARGET uiutilitylib)
+    add_library(uiutilitylib STATIC ${SOURCE_FILES})
+endif()

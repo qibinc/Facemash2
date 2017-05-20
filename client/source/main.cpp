@@ -1,11 +1,10 @@
-#include "include/widget.h"
+#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	Widget w;
-	w.setGeometry(500, 200, 320, 240);
+	client::MainWindow w;
 	w.show();
 
 	return a.exec();

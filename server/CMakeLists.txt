@@ -18,5 +18,6 @@ add_executable(Server ${SOURCE_FILES})
 find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
 qt5_use_modules(Server Core Widgets Gui)
 
-add_subdirectory(utilities)
-target_link_libraries(Server utilitieslib)
+#add_subdirectory(uiutility)
+#include_directories(uiutility/include)
+#target_link_libraries(Server utilitieslib)
