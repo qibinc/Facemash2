@@ -32,6 +32,7 @@
 *.app
 
 # CMake
+build
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
@@ -43,7 +44,6 @@ compile_commands.json
 CTestTestfile.cmake
 
 # C++ objects and libs
-
 *.slo
 *.lo
 *.o
@@ -81,3 +81,12 @@ Makefile*
 # QtCtreator CMake
 CMakeLists.txt.user*
 
+# CLion
+*.iml
+*.xml
+*.name
+
+# binary folders
+bin
+client/bin
+server/bin
