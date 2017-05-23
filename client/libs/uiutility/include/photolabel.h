@@ -16,6 +16,9 @@ Q_OBJECT
 public:
 	PhotoLabel(int photoID, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 
+	void Select();
+
+	void DeSelect();
 private:
 	int photoID;
 

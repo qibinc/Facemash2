@@ -2,8 +2,8 @@
 // Created by 陈齐斌 on 20/05/2017.
 //
 
-#ifndef CLIENT_PHOTOSET_H
-#define CLIENT_PHOTOSET_H
+#ifndef FACEMASH2_PHOTOSET_H
+#define FACEMASH2_PHOTOSET_H
 
 #include <QtWidgets>
 
@@ -21,21 +21,26 @@ Q_OBJECT
 		PhotosPerRow = 3
 	};
 
-	int setID;
+	int setID, numberOfPhoto;
 
+	QLabel **photos;
 public:
-	PhotoSet(int setID, const int fileNum, const QString fileList[], const QString &title, QWidget *parent = nullptr);
+	PhotoSet(int setID, const int fileNum, QString *fileList, const QString &title, QWidget *parent = nullptr);
+
+	QLabel *GetPhoto(int photoID) const;
+
+public slots:
+	void PhotoClicked(int i);
+	void PhotoRightClicked(int i);
+	void PhotoDoubleClicked(int i);
 
 signals:
 	void photoClicked(int setID, int photoID);
 	void photoDoubleClicked(int setID, int photoID);
 	void photoRightClicked(int setID, int photoID);
-public slots:
-	void PhotoClicked(int i);
-	void PhotoRightClicked(int i);
-	void PhotoDoubleClicked(int i);
+
 };
 
 }
 
-#endif //CLIENT_PHOTOSET_H
+#endif //FACEMASH2_PHOTOSET_H

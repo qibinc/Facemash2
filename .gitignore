@@ -87,6 +87,6 @@ CMakeLists.txt.user*
 *.name
 
 # binary folders
-bin
-client/bin
-server/bin
+#bin
+#client/bin
+#server/bin

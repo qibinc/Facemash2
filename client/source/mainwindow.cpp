@@ -3,6 +3,8 @@
 //
 
 #include "mainwindow.h"
+#include "widgetsize.h"
+#include "photosetscontroller.h"
 #include <iostream>
 
 namespace client
@@ -38,8 +40,15 @@ void MainWindow::InitMainScene()
 	albumArea = new QScrollArea;
 	albumArea->setWidgetResizable(true);
 
-//	albumController = new AlbumController;
-	photoSetsController = new PhotoSetsController;
+//	albumController = new AlbumController(this);
+	photoSetsController = new PhotoSetsController(this);
+
+	QShortcut *copyShortCut = new QShortcut(QKeySequence::Copy, this);
+	connect(copyShortCut, SIGNAL(activated()), photoSetsController, SLOT(CopyPhotoFile()));
+
+	QShortcut *delShortCut = new QShortcut(QKeySequence::Delete, this);
+	connect(delShortCut, SIGNAL(activated()), photoSetsController, SLOT(DeletePhotoFile()));
+
 	albumGroupBox = nullptr;
 	photoSetsBox = nullptr;
 

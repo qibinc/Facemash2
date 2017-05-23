@@ -2,15 +2,15 @@
 // Created by 陈齐斌 on 20/05/2017.
 //
 
-#ifndef CLIENT_MAINWINDOW_H
-#define CLIENT_MAINWINDOW_H
+#ifndef FACEMASH2_MAINWINDOW_H
+#define FACEMASH2_MAINWINDOW_H
 
 #include <QtWidgets>
-#include "widgetsize.h"
-#include "photosetscontroller.h"
 
 namespace client
 {
+
+class PhotoSetsController;
 
 class MainWindow : public QMainWindow
 {
@@ -21,7 +21,7 @@ private:
 //	Components
 	QWidget *centralWidget;
 	QHBoxLayout *mainLayout;
-
+	QMenu *menu;
 	enum
 	{ NumAlbums = 3 };
 	QScrollArea *albumArea;
@@ -47,4 +47,4 @@ public:
 
 };
 }
-#endif //CLIENT_WIDGET_H
+#endif //FACEMASH2_WIDGET_H

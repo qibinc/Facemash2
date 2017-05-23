@@ -3,13 +3,17 @@
 //
 
 #include "photolabel.h"
+#include "widgetsize.h"
 
-uiutility::PhotoLabel::PhotoLabel(int photoID, QWidget* parent, Qt::WindowFlags f) : photoID(photoID), ClickableLabel(parent, f)
+namespace uiutility
 {
-
+PhotoLabel::PhotoLabel(int photoID, QWidget *parent, Qt::WindowFlags f)
+		: photoID(photoID), ClickableLabel(parent, f)
+{
+	setStyleSheet(tr("border: %1px outset transparent").arg(SCREEN_UNIT * 1.5));
 }
 
-void uiutility::PhotoLabel::mousePressEvent(QMouseEvent *event)
+void PhotoLabel::mousePressEvent(QMouseEvent *event)
 {
 	if (event->button() == Qt::RightButton)
 		emit rightClicked(photoID);
@@ -17,7 +21,9 @@ void uiutility::PhotoLabel::mousePressEvent(QMouseEvent *event)
 		emit clicked(photoID);
 }
 
-void uiutility::PhotoLabel::mouseDoubleClickEvent(QMouseEvent *event)
+void PhotoLabel::mouseDoubleClickEvent(QMouseEvent *event)
 {
 	emit doubleClicked(photoID);
+}
+
 }
