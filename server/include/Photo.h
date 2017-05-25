@@ -7,7 +7,7 @@
 
 #include <QImage>
 
-namespace Server {
+namespace server {
 
 class Photo {
 private:

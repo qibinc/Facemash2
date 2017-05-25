@@ -15,7 +15,7 @@ enum UserStatus{
     isOnline
 };
 
-namespace Server {
+namespace server {
 
 class ServerManager {
 private:

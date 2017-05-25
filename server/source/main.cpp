@@ -8,9 +8,9 @@
 using namespace std;
 int main(int argc, char* argv[])
 {
-    Server::PhotoManager photoManager;
-//    Server::UserManager userManager;
-//    Server::Date date(30,59,11,24);
+    server::PhotoManager photoManager;
+    server::UserManager userManager;
+//    server::Date date(30,59,11,24);
 //    userManager.addUser(date, "ivanium", "nick", "1234");
 //    userManager.download(date, "ivanium", "image1.jpg");
 //    userManager.upload(date, "ivanium", "image2.jpg");
@@ -19,14 +19,14 @@ int main(int argc, char* argv[])
 //
 //    userManager.deleteUser("ivanium");
 
-    cout << "Server Launched" << endl;
+    cout << "server Launched" << endl;
 
 //    QString file("image1.jpg");
 //    QImage *image = new QImage(file);
 //    photoManager.addPhoto(file, image);
 //    QApplication a(argc, argv);
 //    QLabel* label=new QLabel("test server",0);
-//    QPixmap mp = QPixmap::fromImage(*(photoManager.getImage(file, Server::FullImage)));
+//    QPixmap mp = QPixmap::fromImage(*(photoManager.getImage(file, server::FullImage)));
 //    label->resize(400,400);
 //    label->setPixmap(mp);
 //    label->setScaledContents(false);

@@ -11,7 +11,7 @@
 #include "User.h"
 #include "Photo.h"
 
-namespace Server {
+namespace server {
 
 class UserManager {
 private:

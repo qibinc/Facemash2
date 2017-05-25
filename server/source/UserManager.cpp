@@ -5,7 +5,7 @@
 #include "UserManager.h"
 #include <QDebug>
 
-namespace Server{
+namespace server{
 
     bool UserManager::addUser (Date date , QString ID , QString password , QString nickname) {
         for (int i = 0; i < userList.size(); ++i) {

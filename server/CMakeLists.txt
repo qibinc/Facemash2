@@ -21,4 +21,4 @@ qt5_use_modules(Server Core Widgets Gui Sql)
 
 #add_subdirectory(uiutility)
 #include_directories(uiutility/include)
-#target_link_libraries(Server utilitieslib)
+#target_link_libraries(server utilitieslib)

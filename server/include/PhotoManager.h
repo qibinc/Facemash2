@@ -15,7 +15,7 @@
 #define defaultWidth 720
 #define defaultHeight 1280
 
-namespace Server{
+namespace server{
 enum ImageType{
     FullImage,
     Thumbnail

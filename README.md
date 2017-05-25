@@ -59,7 +59,7 @@ Scanning dependencies of target Client
 [ 38%] Linking CXX executable ../../bin/Client
 [ 38%] Built target Client
 Scanning dependencies of target Server_automoc
-[ 46%] Automatic moc and uic for target Server
+[ 46%] Automatic moc and uic for target server
 Generating moc compilation Server_automoc.cpp
 [ 46%] Built target Server_automoc
 Scanning dependencies of target utilitieslib_automoc
@@ -73,10 +73,10 @@ Scanning dependencies of target utilitieslib
 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: libutilitieslib.a(utilitieslib_automoc.cpp.o) has no symbols
 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: libutilitieslib.a(utilitieslib_automoc.cpp.o) has no symbols
 [ 76%] Built target utilitieslib
-Scanning dependencies of target Server
-[ 84%] Building CXX object server/CMakeFiles/Server.dir/source/main.cpp.o
-[ 92%] Building CXX object server/CMakeFiles/Server.dir/Server_automoc.cpp.o
-[100%] Linking CXX executable ../../bin/Server
-[100%] Built target Server
+Scanning dependencies of target server
+[ 84%] Building CXX object server/CMakeFiles/server.dir/source/main.cpp.o
+[ 92%] Building CXX object server/CMakeFiles/server.dir/Server_automoc.cpp.o
+[100%] Linking CXX executable ../../bin/server
+[100%] Built target server
 ```
 

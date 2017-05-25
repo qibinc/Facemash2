@@ -13,7 +13,7 @@
 
 #include <time.h>
 
-namespace Server {
+namespace server {
 //    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
 //    db.setHostName("localhost");    //数据库主机名
 //    db.setDatabaseName("UserSystem");    //数据库名

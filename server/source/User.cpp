@@ -4,7 +4,7 @@
 
 #include "User.h"
 #include <QDebug>
-namespace Server {
+namespace server {
 
     const QString Date::getStrFullTime () const {
         QString time(

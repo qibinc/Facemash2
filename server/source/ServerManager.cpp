@@ -4,46 +4,47 @@
 
 #include "ServerManager.h"
 
-UserStatus Server::ServerManager::logup (Server::Date date , QString userID , QString password) {
+UserStatus server::ServerManager::logup (server::Date date , QString userID , QString password) {
     if(userManager->addUser(date, userID, password)){
         return succeed;
     }
     return IDCorrupt;
 }
 
-UserStatus Server::ServerManager::login (Server::Date date , QString UserID , QString password) {
+UserStatus server::ServerManager::login (server::Date date , QString UserID , QString password) {
     if(userManager->login(date, UserID, password)){
         return succeed;
     }
     return wrongPW;
 }
 
-UserStatus Server::ServerManager::logout (Server::Date date , QString UserID) {
+UserStatus server::ServerManager::logout (server::Date date , QString UserID) {
     userManager->logout(date, UserID);
     return succeed;
 }
 
-bool Server::ServerManager::uploadPhoto (Server::Date date , QString userID , QString filename) {
+bool server::ServerManager::uploadPhoto (server::Date date , QString userID , QString filename) {
 
     return false;
 }
 
-bool Server::ServerManager::downloadPhoto (Server::Date date , QString userID , QString filename) {
+bool server::ServerManager::downloadPhoto (server::Date date , QString userID , QString filename) {
+
     return false;
 }
 
-bool Server::ServerManager::judgePhoto (Server::Date date , QString userID , QString filename , int score) {
+bool server::ServerManager::judgePhoto (server::Date date , QString userID , QString filename , int score) {
     return false;
 }
 
-bool Server::ServerManager::unJudgePhoto (Server::Date date , QString userID , QString filename , int score) {
+bool server::ServerManager::unJudgePhoto (server::Date date , QString userID , QString filename , int score) {
     return false;
 }
 
-const QList<QImage> *Server::ServerManager::initClientWithThumbnails () {
+const QList<QImage> *server::ServerManager::initClientWithThumbnails () {
     return nullptr;
 }
 
-const QImage *Server::ServerManager::responseWithFullImage (QString filename) {
+const QImage *server::ServerManager::responseWithFullImage (QString filename) {
     return nullptr;
 }

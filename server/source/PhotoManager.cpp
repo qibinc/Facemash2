@@ -5,7 +5,7 @@
 #include "PhotoManager.h"
 #include <QDebug>
 
-using namespace Server;
+using namespace server;
 
 bool comp(Photo &p1, Photo &p2) {// conpare function, can be extended with multiply sort method
     return (p1.getTotalScore() > p2.getTotalScore());

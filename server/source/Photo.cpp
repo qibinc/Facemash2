@@ -7,7 +7,7 @@
 #define minPhotoWidth 90
 #define minPhotoHeight 160
 
-namespace Server {
+namespace server {
 
     Photo::Photo (QString fileName , QImage *image) :
             _fileName(fileName) , _fileLocation(".\\" + _fileName),
