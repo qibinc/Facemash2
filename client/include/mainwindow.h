@@ -1,11 +1,12 @@
 //
-// Created by 陈齐斌 on 20/05/2017.
+// Created by Qibin Chen on 20/05/2017.
 //
 
 #ifndef FACEMASH2_MAINWINDOW_H
 #define FACEMASH2_MAINWINDOW_H
 
 #include <QtWidgets>
+#include <libs/photostream/include/wechatstream.h>
 
 namespace client
 {
@@ -22,23 +23,26 @@ private:
 	QWidget *centralWidget;
 	QHBoxLayout *mainLayout;
 	QMenu *menu;
-	enum
-	{ NumAlbums = 3 };
-	QScrollArea *albumArea;
-	QGroupBox *albumGroupBox;
-//	AlbumController
-	QPushButton *albumButtons[NumAlbums];
+
+	QScrollArea *userArea;
 
 	QScrollArea *photoArea;
 	QGroupBox *photoSetsBox;
 	PhotoSetsController *photoSetsController;
 
+	QThread *photostream;
+	QObject *streamdisplay;
+	QTimer *streamtimer;
+	bool streamOn;
 //	Initialize
 	void InitMainScene();
 
 //	Refresh
-	void RefreshAlbums();
+	void RefreshUsers();
+
+public slots:
 	void RefreshPhotos();
+	void SwitchPhotoStream();
 
 public:
 	explicit MainWindow(QWidget *parent = nullptr);

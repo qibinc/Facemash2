@@ -1,11 +1,11 @@
 //
-// Created by 陈齐斌 on 20/05/2017.
+// Created by Qibin Chen on 20/05/2017.
 //
 
 #include "photoset.h"
 #include "widgetsize.h"
 #include "photolabel.h"
-
+#include "photowindow.h"
 namespace client
 {
 
@@ -19,8 +19,12 @@ PhotoSet::PhotoSet(int setID, const int fileNum, QString *fileList, const QStrin
 	for (i = 0; i < numberOfPhoto; ++i)
 	{
 		photos[i] = new uiutility::PhotoLabel(i);
-
+//qDebug() << fileList[i];
 		QPixmap pixmap(fileList[i]);
+		if (pixmap.isNull())
+		{
+			pixmap.load(fileList[i], "JPG");
+		}
 		pixmap = pixmap.scaled(PHOTO_LABEL_SIZE, Qt::KeepAspectRatio);
 
 		photos[i]->resize(pixmap.size());

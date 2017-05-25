@@ -1,5 +1,5 @@
 //
-// Created by 陈齐斌 on 21/05/2017.
+// Created by Qibin Chen on 21/05/2017.
 //
 
 #include "photolabel.h"

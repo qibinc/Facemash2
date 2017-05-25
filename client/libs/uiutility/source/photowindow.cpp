@@ -1,19 +1,23 @@
 //
-// Created by 陈齐斌 on 22/05/2017.
+// Created by Qibin Chen on 22/05/2017.
 //
 
+#include "widgetsize.h"
 #include "photowindow.h"
 #include <iostream>
 
 namespace uiutility
 {
 
-PhotoWindow::PhotoWindow(const QString &fileName, QWidget *parent)
-		: QMainWindow(parent, Qt::Window | Qt::FramelessWindowHint), photoPixmap(QPixmap(fileName))
+PhotoWindow::PhotoWindow(QPixmap photoPixmap, QWidget *parent)
+		: QMainWindow(parent, Qt::Window | Qt::FramelessWindowHint)
 {
-	setWindowTitle(fileName);
 	centralLabel = new QLabel;
 	centralLabel->setScaledContents(true);
+	if (photoPixmap.width() > PHOTO_LABEL_SIZE.width() * 2)
+	{
+		photoPixmap = photoPixmap.scaled(photoPixmap.size() / photoPixmap.width() * PHOTO_LABEL_SIZE.width() * 2, Qt::KeepAspectRatio, Qt::FastTransformation);
+	}
 	centralLabel->setPixmap(photoPixmap);
 	centralLabel->resize(photoPixmap.size());
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));

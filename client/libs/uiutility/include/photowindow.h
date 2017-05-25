@@ -1,5 +1,5 @@
 //
-// Created by 陈齐斌 on 22/05/2017.
+// Created by Qibin Chen on 22/05/2017.
 //
 
 #ifndef UIUTILITY_PHOTOWINDOW_H
@@ -31,7 +31,7 @@ protected:
 	void keyPressEvent(QKeyEvent *event) override;
 
 public:
-	PhotoWindow(const QString &fileName, QWidget *parent = nullptr);
+	PhotoWindow(QPixmap photoPixmap, QWidget *parent = nullptr);
 
 	virtual ~PhotoWindow();
 

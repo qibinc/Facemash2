@@ -1,5 +1,5 @@
 //
-// Created by 陈齐斌 on 21/05/2017.
+// Created by Qibin Chen on 21/05/2017.
 //
 
 #include "photosetscontroller.h"
@@ -7,6 +7,7 @@
 #include "photowindow.h"
 #include "photoeditmenu.h"
 #include "widgetsize.h"
+#include "filescanner.h"
 #include <iostream>
 
 namespace client
@@ -14,27 +15,32 @@ namespace client
 
 PhotoSetsController::PhotoSetsController(QWidget *parent) : QWidget(parent)
 {
-	numberOfPhotoSet = 3;
-	numberOfPhotoEverySet = new int[3]{4, 2, 3};
-	photoSetFiles = new QString*[numberOfPhotoSet];
-
-	for (int i = 0; i < numberOfPhotoSet; ++i)
-	{
-		photoSetFiles[i] = new QString[numberOfPhotoEverySet[i]];
-		for (int j = 0; j < numberOfPhotoEverySet[i]; ++j)
-			photoSetFiles[i][j] = QString(tr("image%1.jpg").arg(1+j));
-	}
-
-	selectedSetID = selectedPhotoID = -1;
 
 	menu = new uiutility::PhotoEditMenu(this);
 }
 
 QGroupBox *PhotoSetsController::CreatePhotoSetsBox()
 {
+	QList<QString> dirs = localfilemanager::GetDirs(".");
+	numberOfPhotoSet = dirs.size();
+	photoSetFiles = new QString*[numberOfPhotoSet];
+
+	numberOfPhotoEverySet = new int[numberOfPhotoSet];
+
+	for (int i = 0; i < numberOfPhotoSet; ++i)
+	{
+		QList<QString> files = localfilemanager::GetFiles(dirs.value(i));
+		numberOfPhotoEverySet[i] = files.size();
+		photoSetFiles[i] = new QString[numberOfPhotoEverySet[i]];
+
+		for (int j = 0; j < numberOfPhotoEverySet[i]; ++j)
+			photoSetFiles[i][j] = files.value(j);
+	}
+
+	selectedSetID = selectedPhotoID = -1;
+
 	photoSets = new PhotoSet *[numberOfPhotoSet];
 	QGroupBox *photoSetsBox = new QGroupBox(tr("Photos"));
-
 	QVBoxLayout *layout = new QVBoxLayout;
 
 	for (int i = 0; i < numberOfPhotoSet; i++)
@@ -71,7 +77,7 @@ void PhotoSetsController::PhotoRightClicked(int setID, int photoID)
 
 void PhotoSetsController::PhotoDoubleClicked(int setID, int photoID)
 {
-	uiutility::PhotoWindow *photo = new uiutility::PhotoWindow(photoSetFiles[setID][photoID], this);
+	uiutility::PhotoWindow *photo = new uiutility::PhotoWindow(localfilemanager::OpenImage(photoSetFiles[setID][photoID]), this);
 	photo->show();
 }
 

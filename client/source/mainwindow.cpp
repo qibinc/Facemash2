@@ -1,10 +1,14 @@
 //
-// Created by 陈齐斌 on 20/05/2017.
+// Created by Qibin Chen on 20/05/2017.
 //
 
 #include "mainwindow.h"
-#include "widgetsize.h"
 #include "photosetscontroller.h"
+
+#include "widgetsize.h"
+#include "wechatstream.h"
+#include "streamdisplay.h"
+
 #include <iostream>
 
 namespace client
@@ -20,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
 //	setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
 	InitMainScene();
-	RefreshAlbums();
+	RefreshUsers();
 	RefreshPhotos();
 
 }
@@ -37,8 +41,8 @@ void MainWindow::InitMainScene()
 	photoArea = new QScrollArea;
 	photoArea->setWidgetResizable(true);
 
-	albumArea = new QScrollArea;
-	albumArea->setWidgetResizable(true);
+	userArea = new QScrollArea;
+	userArea->setWidgetResizable(true);
 
 //	albumController = new AlbumController(this);
 	photoSetsController = new PhotoSetsController(this);
@@ -49,10 +53,9 @@ void MainWindow::InitMainScene()
 	QShortcut *delShortCut = new QShortcut(QKeySequence::Delete, this);
 	connect(delShortCut, SIGNAL(activated()), photoSetsController, SLOT(DeletePhotoFile()));
 
-	albumGroupBox = nullptr;
 	photoSetsBox = nullptr;
 
-	mainLayout->addWidget(albumArea);
+	mainLayout->addWidget(userArea);
 	mainLayout->addWidget(photoArea);
 
 	mainLayout->setStretch(0, 1);
@@ -61,23 +64,23 @@ void MainWindow::InitMainScene()
 	centralWidget->setLayout(mainLayout);
 }
 
-void MainWindow::RefreshAlbums()
+void MainWindow::RefreshUsers()
 {
-	if (albumGroupBox != nullptr)
-		delete albumGroupBox;
+	QGroupBox *box = new QGroupBox(tr("Temp Area"));
 
-//	albumGroupBox = albumController->CreateAlbum
-
-	albumGroupBox = new QGroupBox(tr("Albums"));
 	QVBoxLayout *layout = new QVBoxLayout;
-	for (int i = 0; i < NumAlbums; ++i)
-	{
-		albumButtons[i] = new QPushButton(tr("Album %1").arg(i + 1));
-		layout->addWidget(albumButtons[i], 0, Qt::AlignTop);
-	}
-	albumGroupBox->setLayout(layout);
 
-	albumArea->setWidget(albumGroupBox);
+	QPushButton *enablePhotoStreamButton = new QPushButton("Stream", this);
+	connect(enablePhotoStreamButton, SIGNAL(clicked()), this, SLOT(SwitchPhotoStream()));
+	layout->addWidget(enablePhotoStreamButton, 0, Qt::AlignTop);
+
+	QPushButton *manualRefreshButton = new QPushButton("Refresh", this);
+	connect(manualRefreshButton, SIGNAL(clicked()), this, SLOT(RefreshPhotos()));
+	layout->addWidget(manualRefreshButton, 0, Qt::AlignTop);
+
+	box->setLayout(layout);
+
+	userArea->setWidget(box);
 
 }
 
@@ -89,7 +92,35 @@ void MainWindow::RefreshPhotos()
 	photoSetsBox = photoSetsController->CreatePhotoSetsBox();
 
 	photoArea->setWidget(photoSetsBox);
+	photoArea->verticalScrollBar()->setValue(photoArea->verticalScrollBar()->maximum());
+
 }
 
+void MainWindow::SwitchPhotoStream()
+{
+	if (!streamOn)
+	{
+		std::cout << "Wechat Photo Stream ON" << std::endl;
+		streamOn = true;
+		photostream = new photostream::WechatStream(this);
+		streamdisplay = new photostream::StreamDisplay(QDate::currentDate().toString(), "wechat_photo_stream_temp/", this);
+
+		streamtimer = new QTimer;
+		streamtimer->setInterval(100);
+//		streamtimer->moveToThread(streamdisplaythread);
+		connect(streamtimer, SIGNAL(timeout()), streamdisplay, SLOT(Refresh()));
+		streamtimer->start();
+
+		photostream->start();
+	}
+	else
+	{
+		std::cout << "Wechat Photo Stream OFF" << std::endl;
+		streamOn = false;
+		streamtimer->stop();
+		photostream->terminate();
+	}
+
+}
 
 }

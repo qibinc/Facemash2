@@ -1,5 +1,5 @@
 //
-// Created by 陈齐斌 on 23/05/2017.
+// Created by Qibin Chen on 23/05/2017.
 //
 
 #ifndef FACEMASH2_PHOTOMENU_H
