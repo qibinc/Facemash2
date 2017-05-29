@@ -34,15 +34,15 @@ public:
 	QLabel *GetPhoto(int photoID) const;
 
 public slots:
-	void PhotoClicked(int i);
-	void PhotoRightClicked(int i);
-	void PhotoDoubleClicked(int i);
-
+	void PhotoClicked(int photoID);
+	void PhotoRightClicked(int photoID);
+	void PhotoDoubleClicked(int photoID);
+	void Score(int photoID, int score);
 signals:
 	void photoClicked(int setID, int photoID);
 	void photoDoubleClicked(int setID, int photoID);
 	void photoRightClicked(int setID, int photoID);
-
+	void photoScored(int setID, int photoID, int score);
 };
 
 }

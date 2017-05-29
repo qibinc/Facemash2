@@ -7,6 +7,11 @@
 
 #include <QtWidgets>
 
+namespace clientnetwork
+{
+class MyClient;
+}
+
 namespace client
 {
 
@@ -17,31 +22,41 @@ class MainWindow : public QMainWindow
 Q_OBJECT
 
 private:
-
-//	Components
+//	View
 	QWidget *centralWidget;
 	QHBoxLayout *mainLayout;
-	QMenu *menu;
-
-	QScrollArea *userArea;
-
-	QScrollArea *photoArea;
+	QScrollArea *controlArea, *photoArea;
 	QGroupBox *photoSetsBox;
+	QPushButton *addPhotoButton, *manualRefreshButton, *enablePhotoStreamButton;
+//  Controller
+	clientnetwork::MyClient *clientNetwork;
 	PhotoSetsController *photoSetsController;
-
 	QThread *photostream;
 	QObject *streamdisplay;
 	QTimer *streamtimer;
 	bool streamOn;
+
 //	Initialize
 	void InitMainScene();
 
-//	Refresh
-	void RefreshUsers();
+	void InitMainControl();
+
+	void InitShortCuts();
+
+	void InitButtons();
+
+signals:
+	void RefreshRequired();
+
+private slots:
+	void SwitchPhotoStream();
+
+	void LogIn();
 
 public slots:
 	void RefreshPhotos();
-	void SwitchPhotoStream();
+
+	void RefreshComplete(QGroupBox *newPhotoSetsBox);
 
 public:
 	explicit MainWindow(QWidget *parent = nullptr);

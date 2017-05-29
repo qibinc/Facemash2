@@ -2,26 +2,29 @@
 // Created by Qibin Chen on 21/05/2017.
 //
 
-#include "photosetscontroller.h"
 #include "photoset.h"
 #include "photowindow.h"
 #include "photoeditmenu.h"
 #include "widgetsize.h"
+
+#include "photosetscontroller.h"
 #include "filescanner.h"
+#include "myclient.h"
+
 #include <iostream>
 
 namespace client
 {
 
-PhotoSetsController::PhotoSetsController(QWidget *parent) : QWidget(parent)
+PhotoSetsController::PhotoSetsController(clientnetwork::MyClient *clientNetwork, QWidget *parent) : QWidget(parent), clientNetwork(clientNetwork)
 {
 	menu = new uiutility::PhotoEditMenu(this);
 }
 
 QGroupBox *PhotoSetsController::CreatePhotoSetsBox()
 {
-	QList<QString> dirs = localfilemanager::GetDirs(".");
-
+	dirs = localfilemanager::GetDirs(".");
+	photoSetFiles.clear();
 	for (int i = 0; i < dirs.size(); ++i)
 	{
 		QList<QString> files = localfilemanager::GetFiles(dirs.value(i));
@@ -42,10 +45,19 @@ QGroupBox *PhotoSetsController::CreatePhotoSetsBox()
 		connect(photoSets[i], SIGNAL(photoClicked(int, int)), this, SLOT(PhotoClicked(int, int)));
 		connect(photoSets[i], SIGNAL(photoRightClicked(int, int)), this, SLOT(PhotoRightClicked(int, int)));
 		connect(photoSets[i], SIGNAL(photoDoubleClicked(int, int)), this, SLOT(PhotoDoubleClicked(int, int)));
+		connect(photoSets[i], SIGNAL(photoScored(int, int, int)), this, SLOT(PhotoScored(int, int, int)));
 	}
 
 	photoSetsBox->setLayout(layout);
 	return photoSetsBox;
+}
+
+void PhotoSetsController::NewPhoto()
+{
+	QStringList photofiles = QFileDialog::getOpenFileNames(this, "Choose a photo", "./", "Images (*.png *.jpg)");
+
+	for (auto photofile : photofiles)
+		clientNetwork->UploadSinglePhoto(photofile);
 }
 
 void PhotoSetsController::PhotoClicked(int setID, int photoID)
@@ -86,5 +98,15 @@ void PhotoSetsController::DeletePhotoFile()
 
 }
 
+void PhotoSetsController::StartRefresh()
+{
+	emit RefreshComplete(CreatePhotoSetsBox());
+}
+
+void PhotoSetsController::PhotoScored(int setID, int photoID, int score)
+{
+//	qDebug() << QDir(dirs.value(setID)).dirName() << QFileInfo(photoSetFiles.value(setID).value(photoID)).fileName();
+	clientNetwork->ScorePhoto(QDir(dirs.value(setID)).dirName(), QFileInfo(photoSetFiles.value(setID).value(photoID)).fileName(), score);
+}
 
 }

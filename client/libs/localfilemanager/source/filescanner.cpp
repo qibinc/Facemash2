@@ -32,7 +32,7 @@ QList<QString> GetDirs(QString dir)
 	while (iter.hasNext())
 	{
 		QString &&dirname = iter.next();
-		if (dirname != "./." && dirname != "./..")
+		if (dirname != "./." && dirname != "./.." && !dirname.contains("cache") && !dirname.contains("temp"))
 		{
 			dirs.append(dirname);
 		}

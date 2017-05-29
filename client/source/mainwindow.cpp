@@ -3,11 +3,12 @@
 //
 
 #include "mainwindow.h"
-#include "photosetscontroller.h"
-
 #include "widgetsize.h"
+
+#include "photosetscontroller.h"
 #include "wechatstream.h"
 #include "streamdisplay.h"
+#include "myclient.h"
 
 #include <iostream>
 
@@ -15,8 +16,7 @@ namespace client
 {
 
 MainWindow::MainWindow(QWidget *parent)
-		: QMainWindow(parent), centralWidget(new QWidget()),
-          mainLayout(nullptr)
+		: QMainWindow(parent), centralWidget(new QWidget()), mainLayout(nullptr)
 {
 	setWindowTitle(tr("Facemash2"));
 	setGeometry(WINDOW_GEOMETRY);
@@ -24,14 +24,16 @@ MainWindow::MainWindow(QWidget *parent)
 //	setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
 	InitMainScene();
-	RefreshUsers();
-	RefreshPhotos();
+	InitMainControl();
 
+	RefreshPhotos();
 }
 
 MainWindow::~MainWindow()
 {
+	clientNetwork->LogOut();
 	delete centralWidget;
+	delete clientNetwork;
 }
 
 void MainWindow::InitMainScene()
@@ -41,21 +43,12 @@ void MainWindow::InitMainScene()
 	photoArea = new QScrollArea;
 	photoArea->setWidgetResizable(true);
 
-	userArea = new QScrollArea;
-	userArea->setWidgetResizable(true);
-
-//	albumController = new AlbumController(this);
-	photoSetsController = new PhotoSetsController(this);
-
-	QShortcut *copyShortCut = new QShortcut(QKeySequence::Copy, this);
-	connect(copyShortCut, SIGNAL(activated()), photoSetsController, SLOT(CopyPhotoFile()));
-
-	QShortcut *delShortCut = new QShortcut(QKeySequence::Delete, this);
-	connect(delShortCut, SIGNAL(activated()), photoSetsController, SLOT(DeletePhotoFile()));
+	controlArea = new QScrollArea;
+	controlArea->setWidgetResizable(true);
 
 	photoSetsBox = nullptr;
 
-	mainLayout->addWidget(userArea);
+	mainLayout->addWidget(controlArea);
 	mainLayout->addWidget(photoArea);
 
 	mainLayout->setStretch(0, 1);
@@ -63,45 +56,66 @@ void MainWindow::InitMainScene()
 
 	centralWidget->setLayout(mainLayout);
 
-	streamdisplay = new photostream::StreamDisplay(QDate::currentDate().toString("yyyy.MM.dd") + "/", "wechat_photo_stream_temp/", this);
+}
 
+void MainWindow::InitMainControl()
+{
+	clientNetwork = new clientnetwork::MyClient;
+	clientNetwork->moveToThread(new QThread(this));
+	connect(clientNetwork, SIGNAL(PhotosSaved(QList<QString>*)), this, SLOT(RefreshPhotos()));
+	photoSetsController = new PhotoSetsController(clientNetwork, this);
+	connect(this, SIGNAL(RefreshRequired()), photoSetsController, SLOT(StartRefresh()));
+	connect(photoSetsController, SIGNAL(RefreshComplete(QGroupBox*)), this, SLOT(RefreshComplete(QGroupBox*)));
+	photostream = new photostream::WechatStream(this);
+	streamdisplay = new photostream::StreamDisplay(clientNetwork, "wechat_photo_stream_temp/", this);
 	streamtimer = new QTimer;
 	streamtimer->setInterval(100);
 	connect(streamtimer, SIGNAL(timeout()), streamdisplay, SLOT(Refresh()));
-	photostream = new photostream::WechatStream(this);
 
+	InitButtons();
+	InitShortCuts();
 }
 
-void MainWindow::RefreshUsers()
+void MainWindow::InitButtons()
 {
-	QGroupBox *box = new QGroupBox(tr("Temp Area"));
-
+	QGroupBox *box = new QGroupBox(tr("Control Area"));
 	QVBoxLayout *layout = new QVBoxLayout;
 
-	QPushButton *enablePhotoStreamButton = new QPushButton("Stream", this);
-	connect(enablePhotoStreamButton, SIGNAL(clicked()), this, SLOT(SwitchPhotoStream()));
-	layout->addWidget(enablePhotoStreamButton, 0, Qt::AlignTop);
+	QPushButton *loginPhotoButton = new QPushButton("Log in", this);
+	connect(loginPhotoButton, SIGNAL(clicked()), this, SLOT(LogIn()));
+	layout->addWidget(loginPhotoButton, 0, Qt::AlignTop);
 
-	QPushButton *manualRefreshButton = new QPushButton("Refresh", this);
+	addPhotoButton = new QPushButton("Add Photo", this);
+	connect(addPhotoButton, SIGNAL(clicked()), photoSetsController, SLOT(NewPhoto()));
+	layout->addWidget(addPhotoButton, 0, Qt::AlignTop);
+	addPhotoButton->setDisabled(true);
+
+	manualRefreshButton = new QPushButton("Refresh", this);
 	connect(manualRefreshButton, SIGNAL(clicked()), this, SLOT(RefreshPhotos()));
 	layout->addWidget(manualRefreshButton, 0, Qt::AlignTop);
+	manualRefreshButton->setDisabled(true);
+
+	enablePhotoStreamButton = new QPushButton("Stream", this);
+	connect(enablePhotoStreamButton, SIGNAL(clicked()), this, SLOT(SwitchPhotoStream()));
+	layout->addWidget(enablePhotoStreamButton, 0, Qt::AlignTop);
+	enablePhotoStreamButton->setDisabled(true);
 
 	box->setLayout(layout);
+	controlArea->setWidget(box);
+}
 
-	userArea->setWidget(box);
+void MainWindow::InitShortCuts()
+{
+	QShortcut *copyShortCut = new QShortcut(QKeySequence::Copy, this);
+	connect(copyShortCut, SIGNAL(activated()), photoSetsController, SLOT(CopyPhotoFile()));
 
+	QShortcut *delShortCut = new QShortcut(QKeySequence::Delete, this);
+	connect(delShortCut, SIGNAL(activated()), photoSetsController, SLOT(DeletePhotoFile()));
 }
 
 void MainWindow::RefreshPhotos()
 {
-	if (photoSetsBox != nullptr)
-		delete photoSetsBox;
-
-	photoSetsBox = photoSetsController->CreatePhotoSetsBox();
-
-	photoArea->setWidget(photoSetsBox);
-	photoArea->verticalScrollBar()->setValue(photoArea->verticalScrollBar()->maximum());
-
+	emit RefreshRequired();
 }
 
 void MainWindow::SwitchPhotoStream()
@@ -121,6 +135,25 @@ void MainWindow::SwitchPhotoStream()
 		photostream->terminate();
 	}
 
+}
+
+void MainWindow::LogIn()
+{
+	clientNetwork->LogIn("facemash2_test");
+	addPhotoButton->setDisabled(false);
+	manualRefreshButton->setDisabled(false);
+	enablePhotoStreamButton->setDisabled(false);
+}
+
+void MainWindow::RefreshComplete(QGroupBox *newPhotoSetsBox)
+{
+	if (photoSetsBox != nullptr)
+		delete photoSetsBox;
+
+	photoSetsBox = newPhotoSetsBox;
+
+	photoArea->setWidget(photoSetsBox);
+	photoArea->verticalScrollBar()->setValue(photoArea->verticalScrollBar()->maximum());
 }
 
 }

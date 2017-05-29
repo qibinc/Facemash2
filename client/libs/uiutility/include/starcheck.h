@@ -13,15 +13,15 @@ namespace uiutility
 class StarCheck : public QWidget
 {
 Q_OBJECT
+	enum {StarNumber = 5};
 
 	QCheckBox **stars;
-	int record;
-	enum {StarNumber = 5};
+	int record, photoID;
 signals:
-	void score(int);
+	void score(int photoID, int record);
 
 public:
-	StarCheck(QWidget *parent);
+	StarCheck(int photoID, QWidget *parent = nullptr);
 
 public slots:
 	void Stared(int id, int state);

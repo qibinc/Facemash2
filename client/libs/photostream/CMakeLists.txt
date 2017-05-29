@@ -8,7 +8,7 @@ if (NOT TARGET photostream)
 
     include_directories(include)
 
-    add_library(photostream STATIC ${SOURCE_FILES} source/streamdisplay.cpp include/streamdisplay.h)
+    add_library(photostream STATIC ${SOURCE_FILES})
 
 
     find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)

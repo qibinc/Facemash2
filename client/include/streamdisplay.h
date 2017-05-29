@@ -7,6 +7,11 @@
 
 #include <QtWidgets>
 
+namespace clientnetwork
+{
+class MyClient;
+}
+
 namespace photostream
 {
 
@@ -14,10 +19,11 @@ class StreamDisplay : public QObject
 {
 Q_OBJECT
 
-	QString from_dir, to_dir;
+	QString from_dir;
+	clientnetwork::MyClient *clientNetwork;
 
 public:
-	StreamDisplay(QString to_dir, QString from_dir = "wechat_photo_stream_temp/", QObject *parent = nullptr);
+	StreamDisplay(clientnetwork::MyClient *clientNetwork, QString from_dir = "wechat_photo_stream_temp/", QObject *parent = nullptr);
 
 public slots:
 	void Refresh();

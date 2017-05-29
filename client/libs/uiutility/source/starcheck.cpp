@@ -8,7 +8,7 @@
 namespace uiutility
 {
 
-StarCheck::StarCheck(QWidget *parent) : QWidget(parent)
+StarCheck::StarCheck(int photoID, QWidget *parent) : QWidget(parent), photoID(photoID)
 {
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	stars = new QCheckBox*[StarNumber];
@@ -50,7 +50,7 @@ void StarCheck::Stared(int id, int state)
 		if (state == StarCheckBox::CLICK)
 		{
 			record = id + 1;
-			emit score(record);
+			emit score(photoID, record);
 		}
 	}
 }

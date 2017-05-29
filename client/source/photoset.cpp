@@ -56,31 +56,36 @@ void PhotoSet::CreateStarCheckBoxes(QGridLayout *layout)
 	int i;
 	for (i = 0; i < fileList.size(); ++i)
 	{
-		starCheckBoxes[i] = new uiutility::StarCheck(photos[i]);
-
+		starCheckBoxes[i] = new uiutility::StarCheck(i, photos[i]);
+		connect(starCheckBoxes[i], SIGNAL(score(int, int)), this, SLOT(Score(int, int)));
 		layout->addWidget(starCheckBoxes[i], i / PhotosPerRow * 2 + 1, i % PhotosPerRow, 1, 1, Qt::AlignCenter);
 //		connect(starCheckBoxes[i], SIGNAL(clicked(int)), this, SLOT(PhotoClicked(int)));
 	}
 }
 
-void PhotoSet::PhotoClicked(int i)
+void PhotoSet::PhotoClicked(int photoID)
 {
-	emit photoClicked(setID, i);
+	emit photoClicked(setID, photoID);
 }
 
-void PhotoSet::PhotoRightClicked(int i)
+void PhotoSet::PhotoRightClicked(int photoID)
 {
-	emit photoRightClicked(setID, i);
+	emit photoRightClicked(setID, photoID);
 }
 
-void PhotoSet::PhotoDoubleClicked(int i)
+void PhotoSet::PhotoDoubleClicked(int photoID)
 {
-	emit photoDoubleClicked(setID, i);
+	emit photoDoubleClicked(setID, photoID);
 }
 
 QLabel *PhotoSet::GetPhoto(int photoID) const
 {
 	return photos[photoID];
+}
+
+void PhotoSet::Score(int photoID, int score)
+{
+	emit photoScored(setID, photoID, score);
 }
 
 
