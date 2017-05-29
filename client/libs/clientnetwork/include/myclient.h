@@ -32,6 +32,8 @@ private:
 
     QString HostIP;
 
+    QMap<QString,double> _map;
+
     void SavePhotos(User *user);
 
     //void SaveBigPhoto(User *user);
@@ -48,7 +50,7 @@ private slots:
 signals:
     void Received(User*);
 
-    void PhotosSaved(QList<QString>*);
+    void PhotosSaved(QList<QString>);
 
     void LogSaved();
 
@@ -77,6 +79,9 @@ public:
 
     void AskforBigPhoto(const QString &date, const QString &title);
 
+    QSize AskforOneSize(const QString& date, const QString& title);
+    
+    double AskforOnePoints(const QString& date, const QString& title);
 };
 }
 #endif // FACEMASH2_MYCLIENT_H

@@ -3,6 +3,7 @@
 
 #include <QImage>
 #include <QString>
+#include <QDateTime>
 
 namespace clientnetwork
 {
@@ -19,7 +20,7 @@ struct Photo
 {
 	QImage _photo;
 	QString _title;
-	QString _uploader;
+	//QString _uploader;
 	QSize _size;
 	double _points;
 
@@ -29,7 +30,7 @@ struct Photo
 
 	Photo(const QString &title, double points);
 
-	Photo(const QString &filepath, const QString &title, const QString &uploader, double points);
+	Photo(const QImage& photo, const QString& title, const QSize& size, double points);
 };
 
 struct Group
@@ -44,14 +45,14 @@ struct Group
 struct User
 {
 	QString _username;
-	QString _password;
-	QString _datetime;
+	//QString _password;
+	QDateTime _datetime;
 	ClientType _clienttype;
 	ServerType _servertype;
 	QList<Group> _groups;
 	qint32 _groupnum;
 	QString _log;
-	QByteArray _config;
+	//QByteArray _config;
 
 	User();
 };

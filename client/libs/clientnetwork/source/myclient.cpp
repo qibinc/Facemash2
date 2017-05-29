@@ -106,7 +106,7 @@ void MyClient::SavePhotos(User * user)
         return;
     }
 
-    QList<QString> * filepaths = new QList<QString>;
+    QList<QString> filepaths;
 
     QByteArray JsonArray = file->readAll();
     QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
@@ -129,13 +129,14 @@ void MyClient::SavePhotos(User * user)
         for (int j = 0; j < user->_groups.at(i)._photonum; j++)
         {
             QJsonObject inobj2;
-            inobj2.insert("uploader", user->_groups.at(i)._photos.at(j)._uploader);
+            //inobj2.insert("uploader", user->_groups.at(i)._photos.at(j)._uploader);
+            _map.insert(user->_groups.at(i)._date + user->_groups.at(i)._photos.at(j)._title, user->_groups.at(i)._photos.at(j)._points);
             inobj2.insert("points", user->_groups.at(i)._photos.at(j)._points);
             //inobj2.insert("type", "small");
             inobj2.insert("width", user->_groups.at(i)._photos.at(j)._size.width());
             inobj2.insert("height", user->_groups.at(i)._photos.at(j)._size.height());
             QString Locate = Prefix + "/" + user->_groups.at(i)._photos.at(j)._title;
-            filepaths->append(Locate);
+            filepaths.append(Locate);
             qDebug() << Locate;
             if (!user->_groups.at(i)._photos.at(j)._photo.save(Locate, 0, 100))
                 qDebug() << "Save Photos Error!";
@@ -201,6 +202,7 @@ void MyClient::UpdatePoints(User * user)
             //obj[user->_groups.at(i)._date][user->_groups.at(i)._photos.at(j)._title]
             QJsonObject date = obj[user->_groups.at(i)._date].toObject();
             QJsonObject title = date[user->_groups.at(i)._photos.at(j)._title].toObject();
+            _map.insert(user->_groups.at(i)._date + user->_groups.at(i)._photos.at(j)._title, user->_groups.at(i)._photos.at(j)._points);
             title["points"] = user->_groups.at(i)._photos.at(j)._points;
             date.insert(user->_groups.at(i)._photos.at(j)._title, title);
             obj.insert(user->_groups.at(i)._date, date);
@@ -224,32 +226,57 @@ void MyClient::UpdatePoints(User * user)
 void MyClient::LogIn(const QString &username)
 {
     QFile *file = new QFile(KeepPath + "config.json");
-    if (!file->open(QIODevice::ReadWrite))
+    if(!file->open(QFile::ReadWrite))
     {
-        qDebug() << "Open Config File Error in LogIn!";
+        qDebug()<<"Open Config File Error in LogIn!";
         return;
     }
 
-	User user;
-	user._clienttype = LOGIN;
-	user._config = file->readAll();
-	user._username = username;
-	user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
-	UserName = username;
+    QByteArray JsonArray = file->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
+    QJsonObject object = doc.object();
+
+    User user;
+    user._clienttype = LOGIN;
+    //user._config = file->readAll();
+    user._username = username;
+    user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
+    UserName = username;
 
     file->close();
+
+    if(!object.isEmpty())
+    {
+        QStringList dates = object.keys();
+        user._groupnum = dates.size();
+        for(int i = 0; i < user._groupnum; i++)
+        {
+            Group group;
+            group._date = dates.at(i);
+            QJsonObject dateobj = object[dates.at(i)].toObject();
+            QStringList photos = dateobj.keys();
+            group._photonum = photos.size();
+            for(int j = 0; j < group._photonum; j++)
+            {
+                QJsonObject photoobj = dateobj[photos.at(j)].toObject();
+                _map.insert(group._date + photos.at(j), photoobj["points"].toDouble());
+                group._photos.append(Photo(photos.at(j)));
+            }
+            user._groups.append(group);
+        }
+    }
 
     QByteArray BtArray;
     QDataStream out(&BtArray, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_6);
 
-    out << (qint64) 0;
-    out << user;
+    out<<(qint64)0;
+    out<<user;
     out.device()->seek(0);
-    out << (qint64) (BtArray.size() - sizeof(qint64));
-
+    out<<(qint64)(BtArray.size() - sizeof(qint64));
+    qDebug()<<BtArray.size();
     qint64 temp = _readwritesocket->write(BtArray);
-
+    qDebug()<<temp;
 }
 
 
@@ -257,7 +284,7 @@ void MyClient::LogOut()
 {
     User user;
     user._clienttype = LOGOUT;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
     user._username = UserName;
 
     QByteArray outArray;
@@ -293,7 +320,7 @@ void MyClient::AskforLog()
     User user;
     user._clienttype = FORLOG;
     user._username = UserName;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();
     //user._config = file->readAll();
 
     QByteArray BtArray;
@@ -317,17 +344,19 @@ void MyClient::UploadSinglePhoto(const QString &photopath)
 	qDebug() << "clientnetwork::UploadSinglePhoto " << photopath;
     QString date = QDate::currentDate().toString(Qt::ISODate);
     QString title = QFileInfo(photopath).fileName();
+    QImage image(photopath);
 
-    QImage image(localfilemanager::OpenImage(photopath)->toImage());
+    QList<QString> filepaths;
+
     User user;
     user._clienttype = ADD;
     user._groupnum = 1;
     user._username = UserName;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
     Group group;
     group._photonum = 1;
     group._date = QDate::currentDate().toString(Qt::ISODate);
-    group._photos.append(Photo(photopath, title, UserName, 0));
+    group._photos.append(Photo(image,title,image.size(),0));
     user._groups.append(group);
 
     QByteArray outArray;
@@ -348,6 +377,8 @@ void MyClient::UploadSinglePhoto(const QString &photopath)
     }
     delete dir;
     QFile::copy(photopath, KeepPath + date + "/" + title);//Copy 照片 到本地
+    filepaths.append(KeepPath + date + "/" + title);
+    _map.insert(date + title, 0);
 
     QFile *file = new QFile(KeepPath + "config.json");
     if (!file->open(QFile::ReadWrite))
@@ -360,21 +391,22 @@ void MyClient::UploadSinglePhoto(const QString &photopath)
     QJsonDocument doc = QJsonDocument::fromJson(array);
     QJsonObject object = doc.object();
 
-    if (object.contains(date))
+    if(object.contains(date))
     {
         QJsonObject dateobj = object[date].toObject();
         QJsonObject photoobj;
-        photoobj.insert("uploader", UserName);
+        //photoobj.insert("uploader", UserName);
         photoobj.insert("points", 0);
         photoobj.insert("width", image.width());
         photoobj.insert("height", image.height());
         dateobj.insert(title, photoobj);
         object.insert(date, dateobj);
-    } else
+    }
+    else
     {
         QJsonObject dateobj;
         QJsonObject photoobj;
-        photoobj.insert("uploader", UserName);
+        //photoobj.insert("uploader", UserName);
         photoobj.insert("points", 0);
         //photoobj.insert("type", "big");
         photoobj.insert("width", image.width());
@@ -389,9 +421,8 @@ void MyClient::UploadSinglePhoto(const QString &photopath)
     file->seek(0);
     file->write(array);
     file->close();
-	QList<QString> *t= new QList<QString>;
-	t->append(photopath);
-	emit PhotosSaved(t);
+
+    emit PhotosSaved(filepaths);
 }
 
 void MyClient::ScorePhoto(const QString &date, const QString &title, double points)
@@ -402,7 +433,7 @@ void MyClient::ScorePhoto(const QString &date, const QString &title, double poin
     user._clienttype = EVAL;
     user._groupnum = 1;
     user._username = UserName;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();
     Group group;
     group._date = date;
     group._photonum = 1;
@@ -452,7 +483,7 @@ void MyClient::AskforBigPhoto(const QString &date, const QString &title)
     User user;
     user._clienttype = FORBIG;
     user._username = UserName;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
     user._groupnum = 1;
     Group group;
     group._photonum = 1;
@@ -464,12 +495,58 @@ void MyClient::AskforBigPhoto(const QString &date, const QString &title)
     QDataStream out(&outArray, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_6);
 
-    out << (qint64) 0;
-    out << user;
+    out<<(qint64)0;
+    out<<user;
     out.device()->seek(0);
-    out << (qint64) (outArray.size() - sizeof(qint64));
+    out<<(qint64)(outArray.size() - sizeof(qint64));
 
     qint64 temp = _readwritesocket->write(outArray);
+}
+
+QSize MyClient::AskforOneSize(const QString &date, const QString &title)
+{
+    QFile *file = new QFile(KeepPath + "config.json");
+    if(!file->open(QFile::ReadOnly))
+    {
+        qDebug()<<"Open Config Error in AskforOneSize!";
+        return QSize();
+    }
+    QByteArray JsonArray;
+    JsonArray = file->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
+    QJsonObject object = doc.object();
+    file->close();
+
+    QSize size;
+    QJsonObject dateobj = object[date].toObject();
+    QJsonObject photoobj = dateobj[title].toObject();
+    size.setHeight(photoobj["height"].toInt());
+    size.setWidth(photoobj["width"].toInt());
+    return size;
+}
+
+double MyClient::AskforOnePoints(const QString &date, const QString &title)
+{
+    /*QFile *file = new QFile(KeepPath + "config.json");
+    if(!file->open(QFile::ReadOnly))
+    {
+        qDebug()<<"Open Config Error in AskforOnePoints!";
+        return -1;
+    }
+    QByteArray JsonArray;
+    JsonArray = file->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
+    QJsonObject object = doc.object();
+    file->close();
+
+    //QSize size;
+    QJsonObject dateobj = object[date].toObject();
+    QJsonObject photoobj = dateobj[title].toObject();
+    //size.setHeight(photoobj["height"]);
+    //size.setWidth(photoobj["width"]);
+    return photoobj["points"].toDouble();*/
+
+    return _map.value(date + title);
 }
 
 }
