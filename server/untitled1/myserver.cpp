@@ -17,49 +17,76 @@ MyServer::~MyServer()
 void MyServer::GetConnection()
 {
     qDebug()<<"Connected!";
-    _readwritesocket = _server->nextPendingConnection();
-    QObject::connect(_readwritesocket, SIGNAL(readyRead()), this, SLOT(KeepMessage()));
+    QTcpSocket* _socket = _server->nextPendingConnection();
+    //_readwritesockets.append(_socket);
+    //_socketdescriptors.append(_socket->socketDescriptor());
+    QObject::connect(_socket, SIGNAL(readyRead()), this, SLOT(KeepMessage()));
+    QObject::connect(_socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 }
 
 void MyServer::KeepMessage()
 {
-    if(totalBytes == 0 && _readwritesocket->bytesAvailable() >= sizeof(qint64))
+    QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
+    if(totalBytes == 0 && socket->bytesAvailable() >= sizeof(qint64))
     {
-        QDataStream in(_readwritesocket);
+        QDataStream in(socket);
         in.setVersion(QDataStream::Qt_4_6);
         in>>totalBytes;
-        QString path = KeepPath + "cache.txt";
+        /*QString path = KeepPath + "cache.txt";
         LocalFile = new QFile(path);
         if(!LocalFile->open(QFile::WriteOnly))
         {
             qDebug()<<"Open File Error!";
             return;
-        }
+        }*/
     }
 
     if(BytesReceived < totalBytes)
     {
-        BytesReceived += _readwritesocket->bytesAvailable();
-        inArray = _readwritesocket->readAll();
-        LocalFile->write(inArray);
-        inArray.resize(0);
+        BytesReceived += socket->bytesAvailable();
+        inArray.append(socket->readAll());
+        //LocalFile->write(inArray);
+        //inArray.resize(0);
         if(BytesReceived == totalBytes)
         {
-            LocalFile->close();
+            //LocalFile->close();
             totalBytes = 0;
             BytesReceived = 0;
-            emit GetMessageFromClient();
+
+            User *user = new User;
+            QDataStream in(&inArray, QIODevice::ReadOnly);
+            in.setVersion(QDataStream::Qt_4_6);
+
+            in>>(*user);
+
+            inArray.resize(0);
+
+            if(user->_clienttype == LOGIN)
+            {
+                if(_map.contains(user->_username))
+                {
+                    qDebug()<<"UserName Existed!";
+                    socket->disconnectFromHost();
+                    socket->waitForDisconnected();
+                    delete user;
+                }
+                else
+                {
+                    _map.insert(user->_username,socket);
+                    emit GetMessageFromClient(user);
+                }
+            }
+            else if(user->_clienttype == LOGOUT)
+            {
+                _map.remove(user->_username);
+                emit GetMessageFromClient(user);
+            }
         }
     }
 }
 
-void MyServer::SetPath(const QString &path)
-{
-    KeepPath = path;
-}
 
-
-void MyServer::SendMessage()
+/*void MyServer::SendMessage()
 {
     qDebug()<<"hehe";
     QList<qint32> groupnums;
@@ -106,17 +133,20 @@ void MyServer::SendPoints()
     points.append(23.0);
     points.append(15.0);
     UpdatePoints(groupnums.size(),groupnums,dates,titles,points);
-}
+}*/
 
-void MyServer::PassAllPhotos(qint32 groupnum, const QList<qint32> &photonums, const QList<QString> &dates, const QList<QString> &filepaths, const QList<QString> &titles, const QList<QString> &uploaders, const QList<double> &points)
+void MyServer::PassAllPhotos(const QString& username, qint32 groupnum, const QList<qint32> &photonums, const QList<QString> &dates, const QList<QImage> &images, const QList<QSize> &sizes, const QList<QString> &titles, const QList<QString> &uploaders, const QList<double> &points)
 {
-    qDebug()<<"pass!";
+    qDebug()<<"pass photos!";
     qDebug()<<photonums.size();
-    qDebug()<<filepaths.size();
+    //qDebug()<<filepaths.size();
     for(int i = 0; i < titles.size(); i++)
     {
         qDebug()<<titles.at(i);
     }
+
+    QTcpSocket *socket = _map.value(username);
+
     User user;
     //user._groupnum = photonums.size();
     user._groupnum = groupnum;
@@ -129,11 +159,11 @@ void MyServer::PassAllPhotos(qint32 groupnum, const QList<qint32> &photonums, co
         for(int j = 0; j < group._photonum; j++)
         {
             //QPixmap pixmap(filepaths.at(k));
-            qDebug()<<filepaths.at(k);
+            //qDebug()<<filepaths.at(k);
             //qDebug()<<pixmap.isNull();
             //QLabel label;
             //label.setPixmap(pixmap);
-            group._photos.append(Photo(filepaths.at(k), titles.at(k), uploaders.at(k), points.at(k)));
+            group._photos.append(Photo(images.at(k), titles.at(k), uploaders.at(k), sizes.at(k), points.at(k)));
             qDebug()<<"here:"<<group._photos.size();
             //group._photos.at(0)._photo.save(QString::number(k) + ".jpg",0,100);
             k++;
@@ -150,13 +180,14 @@ void MyServer::PassAllPhotos(qint32 groupnum, const QList<qint32> &photonums, co
     out.device()->seek(0);
     out<<(qint64)(BtArray.size() - sizeof(qint64));
     qDebug()<<BtArray.size();
-    qint64 _size = _readwritesocket->write(BtArray);
+    qint64 _size = socket->write(BtArray);
     qDebug()<<_size;
 }
 
 void MyServer::PassUserLog(const QString &username, const QString &log)
 {
     qDebug()<<"Pass User Log!";
+    QTcpSocket *socket = _map.value(username);
     User user;
     user._username = username;
     user._log = log;
@@ -170,14 +201,17 @@ void MyServer::PassUserLog(const QString &username, const QString &log)
     out.device()->seek(0);
     out<<(qint64)(BtArray.size() - sizeof(qint64));
     qDebug()<<BtArray.size();
-    qint64 _size = _readwritesocket->write(BtArray);
+    qint64 _size = socket->write(BtArray);
     qDebug()<<_size;
 }
 
 
-void MyServer::UpdatePoints(qint32 groupnum, const QList<qint32> &photonums, const QList<QString> &dates, const QList<QString> &titles, const QList<double> &points)
+void MyServer::UpdatePoints(const QString& username, qint32 groupnum, const QList<qint32> &photonums, const QList<QString> &dates, const QList<QString> &titles, const QList<double> &points)
 {
     qDebug()<<"Update Points!";
+
+    QTcpSocket *socket = _map.value(username);
+
     User user;
     user._servertype = POINTS;
     user._groupnum = groupnum;
@@ -205,6 +239,6 @@ void MyServer::UpdatePoints(qint32 groupnum, const QList<qint32> &photonums, con
     out.device()->seek(0);
     out<<(qint64)(BtArray.size() - sizeof(qint64));
     qDebug()<<BtArray.size();
-    qint64 _size = _readwritesocket->write(BtArray);
+    qint64 _size = socket->write(BtArray);
     qDebug()<<_size;
 }

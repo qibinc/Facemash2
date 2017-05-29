@@ -39,10 +39,10 @@ private slots:
     void ReceiveMessage();
 
 signals:
-    Received(User*);
-    PhotosSaved(QList<QString>*);
-    LogSaved();
-    PointsUpdated();
+    void Received(User*);
+    void PhotosSaved(QList<QString>*);
+    void LogSaved();
+    void PointsUpdated();
 
 public:
     explicit MyClient(QObject* parent = 0);

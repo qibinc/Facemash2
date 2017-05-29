@@ -17,8 +17,8 @@ Photo::Photo(const QString &title, double points):
 
 }
 
-Photo::Photo(const QString &filepath, const QString &title, const QString &uploader, double points):
-    _photo(filepath), _title(title), _uploader(uploader), _points(points)
+Photo::Photo(const QImage &photo, const QString &title, const QString &uploader, const QSize& size, double points):
+    _photo(photo), _title(title), _uploader(uploader), _size(size), _points(points)
 {
 
 }
@@ -28,6 +28,7 @@ QDataStream &operator<<(QDataStream & out, const Photo& photo)
     out<<photo._photo;
     out<<photo._title;
     out<<photo._uploader;
+    out<<photo._size;
     out<<photo._points;
     return out;
 }
@@ -37,6 +38,7 @@ QDataStream &operator>>(QDataStream& in, Photo& photo)
     in>>photo._photo;
     in>>photo._title;
     in>>photo._uploader;
+    in>>photo._size;
     in>>photo._points;
     return in;
 }
@@ -74,7 +76,7 @@ User::User():
 QDataStream &operator <<(QDataStream & out, const User& user)
 {
     out<<user._username;
-    out<<user._password;
+    //out<<user._password;
     out<<user._datetime;
     out<<(qint32)user._clienttype;
     out<<(qint32)user._servertype;
@@ -88,7 +90,7 @@ QDataStream &operator <<(QDataStream & out, const User& user)
 QDataStream &operator >>(QDataStream &in, User& user)
 {
     in>>user._username;
-    in>>user._password;
+    //in>>user._password;
     in>>user._datetime;
     in>>(qint32&)user._clienttype;
     in>>(qint32&)user._servertype;

@@ -212,7 +212,7 @@ void MyClient::UpdatePoints(User *user)
 void MyClient::LogIn(const QString &username)
 {
     QFile *file = new QFile(KeepPath + "config.json");
-    if(!file->open(QFile::ReadOnly))
+    if(!file->open(QFile::ReadWrite))
     {
         qDebug()<<"Open Config File Error in LogIn!";
         return;
@@ -314,7 +314,7 @@ void MyClient::UploadOnePhoto(const QString &photopath)
     Group group;
     group._photonum = 1;
     group._date = QDate::currentDate().toString(Qt::ISODate);
-    group._photos.append(Photo(photopath,title,UserName,0));
+    group._photos.append(Photo(image,title,UserName,image.size(),0));
     user._groups.append(group);
 
     QByteArray outArray;
@@ -329,7 +329,7 @@ void MyClient::UploadOnePhoto(const QString &photopath)
     qint64 temp = _readwritesocket->write(outArray);
     qDebug()<<temp;
 
-    QDir *dir = new Dir;
+    QDir *dir = new QDir;
     if(!dir->exists(KeepPath + date))
     {
         qDebug()<<"mkdir" + KeepPath + date;

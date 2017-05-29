@@ -17,7 +17,7 @@ struct Photo
     Photo();
     Photo(const QString& title);
     Photo(const QString& title, double points);
-    Photo(const QString& filepath, const QString& title, const QString& uploader, double points);
+    Photo(const QImage& photo, const QString& title, const QString& uploader, const QSize& size, double points);
 };
 
 struct Group
@@ -31,7 +31,7 @@ struct Group
 struct User
 {
     QString _username;
-    QString _password;
+    //QString _password;
     QString _datetime;
     ClientType _clienttype;
     ServerType _servertype;
