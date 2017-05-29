@@ -29,6 +29,8 @@ private:
 
     QString HostIP;
 
+    //QMap<QString,double> _map;
+
     void SavePhotos(User *user);
     //void SaveBigPhoto(User *user);
     void SaveLog(User *user);
@@ -57,7 +59,8 @@ public:
     void AskforLog();
     void UploadOnePhoto(const QString& photopath);
     void AskforBigPhoto(const QString& date, const QString& title);
-
+    QSize AskforOneSize(const QString& date, const QString& title);
+    double AskforOnePoints(const QString& date, const QString& title);
 };
 
 #endif // MYCLIENT_H

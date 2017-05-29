@@ -3,6 +3,8 @@
 
 #include <QImage>
 #include <QString>
+#include <QDateTime>
+
 namespace dyh
 {
 enum ClientType {DEFAULTc, LOGIN, LOGOUT, FORBIG, ADD, EVAL, FORLOG}; //用户的操作种类
@@ -33,13 +35,13 @@ struct User
 {
     QString _username;
     //QString _password;
-    QString _datetime;
+    QDateTime _datetime;
     ClientType _clienttype;
     ServerType _servertype;
     QList<Group> _groups;
     qint32 _groupnum;
     QString _log;
-    QByteArray _config;
+    //QByteArray _config;
     User();
 };
 

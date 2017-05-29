@@ -218,14 +218,37 @@ void MyClient::LogIn(const QString &username)
         return;
     }
 
+    QByteArray JsonArray = file->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
+    QJsonObject object = doc.object();
+
     User user;
     user._clienttype = LOGIN;
-    user._config = file->readAll();
+    //user._config = file->readAll();
     user._username = username;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
     UserName = username;
 
     file->close();
+
+    if(!object.isEmpty())
+    {
+        QStringList dates = object.keys();
+        user._groupnum = dates.size();
+        for(int i = 0; i < user._groupnum; i++)
+        {
+            Group group;
+            group._date = dates.at(i);
+            QStringList photos = object[dates.at(i)].toObject().keys();
+            group._photonum = photos.size();
+            for(int j = 0; j < group._photonum; j++)
+            {
+
+                group._photos.append(Photo(photos.at(j)));
+            }
+            user._groups.append(group);
+        }
+    }
 
     QByteArray BtArray;
     QDataStream out(&BtArray, QIODevice::WriteOnly);
@@ -245,7 +268,7 @@ void MyClient::LogOut()
 {
     User user;
     user._clienttype = LOGOUT;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
     user._username = UserName;
 
     QByteArray outArray;
@@ -281,7 +304,7 @@ void MyClient::AskforLog()
     User user;
     user._clienttype = FORLOG;
     user._username = UserName;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
     //user._config = file->readAll();
 
     QByteArray BtArray;
@@ -312,7 +335,7 @@ void MyClient::UploadOnePhoto(const QString &photopath)
     user._clienttype = ADD;
     user._groupnum = 1;
     user._username = UserName;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
     Group group;
     group._photonum = 1;
     group._date = QDate::currentDate().toString(Qt::ISODate);
@@ -392,7 +415,7 @@ void MyClient::EvalPhoto(const QString &date, const QString &title, double point
     user._clienttype = EVAL;
     user._groupnum = 1;
     user._username = UserName;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
     Group group;
     group._date = date;
     group._photonum = 1;
@@ -442,7 +465,7 @@ void MyClient::AskforBigPhoto(const QString &date, const QString &title)
     User user;
     user._clienttype = FORBIG;
     user._username = UserName;
-    user._datetime = QDateTime::currentDateTime().toString(Qt::ISODate);
+    user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
     user._groupnum = 1;
     Group group;
     group._photonum = 1;
@@ -462,4 +485,49 @@ void MyClient::AskforBigPhoto(const QString &date, const QString &title)
     qDebug()<<outArray.size();
     qint64 temp = _readwritesocket->write(outArray);
     qDebug()<<temp;
+}
+
+
+QSize MyClient::AskforOneSize(const QString &date, const QString &title)
+{
+    QFile *file = new QFile(KeepPath + "config.json");
+    if(!file->open(QFile::ReadOnly))
+    {
+        qDebug()<<"Open Config Error in AskforOneSize!";
+        return QSize();
+    }
+    QByteArray JsonArray;
+    JsonArray = file->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
+    QJsonObject object = doc.object();
+    file->close();
+
+    QSize size;
+    QJsonObject dateobj = object[date].toObject();
+    QJsonObject photoobj = dateobj[title].toObject();
+    size.setHeight(photoobj["height"].toInt());
+    size.setWidth(photoobj["width"].toInt());
+    return size;
+}
+
+double MyClient::AskforOnePoints(const QString &date, const QString &title)
+{
+    QFile *file = new QFile(KeepPath + "config.json");
+    if(!file->open(QFile::ReadOnly))
+    {
+        qDebug()<<"Open Config Error in AskforOnePoints!";
+        return -1;
+    }
+    QByteArray JsonArray;
+    JsonArray = file->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
+    QJsonObject object = doc.object();
+    file->close();
+
+    //QSize size;
+    QJsonObject dateobj = object[date].toObject();
+    QJsonObject photoobj = dateobj[title].toObject();
+    //size.setHeight(photoobj["height"]);
+    //size.setWidth(photoobj["width"]);
+    return photoobj["points"].toDouble();
 }

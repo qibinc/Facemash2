@@ -45,7 +45,8 @@ QDataStream &operator>>(QDataStream& in, Photo& photo)
 }
 
 
-Group::Group()
+Group::Group():
+    _photonum(0)
 {
 
 }
@@ -69,7 +70,7 @@ QDataStream &operator>>(QDataStream & in, Group& group)
 
 
 User::User():
-    _clienttype(DEFAULTc),_servertype(DEFAULTs)
+    _clienttype(DEFAULTc),_servertype(DEFAULTs),_groupnum(0)
 {
 
 }
@@ -84,7 +85,7 @@ QDataStream &operator <<(QDataStream & out, const User& user)
     out<<user._log;
     out<<user._groupnum;
     out<<user._groups;
-    out<<user._config;
+    //out<<user._config;
     return out;
 }
 
@@ -98,7 +99,7 @@ QDataStream &operator >>(QDataStream &in, User& user)
     in>>user._log;
     in>>user._groupnum;
     in>>user._groups;
-    in>>user._config;
+    //in>>user._config;
     return in;
 }
 }
