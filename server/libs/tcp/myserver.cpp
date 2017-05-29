@@ -182,6 +182,7 @@ void MyServer::PassAllPhotos(const QString& username, qint32 groupnum, const QLi
     out<<(qint64)(BtArray.size() - sizeof(qint64));
     qDebug()<<BtArray.size();
     qint64 _size = socket->write(BtArray);
+    socket->waitForBytesWritten();
     qDebug()<<_size;
 }
 
@@ -203,6 +204,7 @@ void MyServer::PassUserLog(const QString &username, const QString &log)
     out<<(qint64)(BtArray.size() - sizeof(qint64));
     qDebug()<<BtArray.size();
     qint64 _size = socket->write(BtArray);
+    socket->waitForBytesWritten();
     qDebug()<<_size;
 }
 
@@ -241,6 +243,7 @@ void MyServer::UpdatePoints(const QString& username, qint32 groupnum, const QLis
     out<<(qint64)(BtArray.size() - sizeof(qint64));
     qDebug()<<BtArray.size();
     qint64 _size = socket->write(BtArray);
+    socket->waitForBytesWritten();
     qDebug()<<_size;
 }
 }

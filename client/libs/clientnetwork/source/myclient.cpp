@@ -276,6 +276,7 @@ void MyClient::LogIn(const QString &username)
     out<<(qint64)(BtArray.size() - sizeof(qint64));
     qDebug()<<BtArray.size();
     qint64 temp = _readwritesocket->write(BtArray);
+    _readwritesocket->waitForBytesWritten();
     qDebug()<<temp;
 }
 
@@ -333,6 +334,7 @@ void MyClient::AskforLog()
     out << (qint64) (BtArray.size() - sizeof(qint64));
 
     qint64 temp = _readwritesocket->write(BtArray);
+    _readwritesocket->waitForBytesWritten();
 
 
     //file->close();
@@ -368,6 +370,7 @@ void MyClient::UploadSinglePhoto(const QString &photopath)
     out.device()->seek(0);
     out << (qint64) (outArray.size() - sizeof(qint64));
     qint64 temp = _readwritesocket->write(outArray);
+    _readwritesocket->waitForBytesWritten();
 
     QDir *dir = new QDir;
     if (!dir->exists(KeepPath + date))
@@ -450,6 +453,7 @@ void MyClient::ScorePhoto(const QString &date, const QString &title, double poin
     out << (qint64) (array.size() - sizeof(qint64));
     qDebug() << array.size();
     qint64 temp = _readwritesocket->write(array);
+    _readwritesocket->waitForBytesWritten();
     qDebug() << temp;
 
     /*QFile *file = new QFile(KeepPath + "config.json");
@@ -501,6 +505,7 @@ void MyClient::AskforBigPhoto(const QString &date, const QString &title)
     out<<(qint64)(outArray.size() - sizeof(qint64));
 
     qint64 temp = _readwritesocket->write(outArray);
+    _readwritesocket->waitForBytesWritten();
 }
 
 QSize MyClient::AskforOneSize(const QString &date, const QString &title)
