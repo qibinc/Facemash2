@@ -2,10 +2,7 @@
 import itchat, os
 from itchat.content import *
 
-@itchat.msg_register([TEXT])
-def text_reply(msg):
-    itchat.send('%s: %s' % (msg['Type'], msg['Text']), msg['ToUserName'])
-
+@itchat.msg_register([PICTURE], isGroupChat=True)
 @itchat.msg_register([PICTURE])
 def download_files(msg):
     path = 'wechat_photo_stream_temp/' + msg['FromUserName'] + '/'

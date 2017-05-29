@@ -81,7 +81,7 @@ void MainWindow::InitButtons()
 	QGroupBox *box = new QGroupBox(tr("Control Area"));
 	QVBoxLayout *layout = new QVBoxLayout;
 
-	QPushButton *loginPhotoButton = new QPushButton("Log in", this);
+	loginPhotoButton = new QPushButton("Log in", this);
 	connect(loginPhotoButton, SIGNAL(clicked()), this, SLOT(LogIn()));
 	layout->addWidget(loginPhotoButton, 0, Qt::AlignTop);
 
@@ -94,11 +94,6 @@ void MainWindow::InitButtons()
 	connect(manualRefreshButton, SIGNAL(clicked()), this, SLOT(RefreshPhotos()));
 	layout->addWidget(manualRefreshButton, 0, Qt::AlignTop);
 	manualRefreshButton->setDisabled(true);
-
-	enablePhotoStreamButton = new QPushButton("Stream", this);
-	connect(enablePhotoStreamButton, SIGNAL(clicked()), this, SLOT(SwitchPhotoStream()));
-	layout->addWidget(enablePhotoStreamButton, 0, Qt::AlignTop);
-	enablePhotoStreamButton->setDisabled(true);
 
 	box->setLayout(layout);
 	controlArea->setWidget(box);
@@ -118,31 +113,20 @@ void MainWindow::RefreshPhotos()
 	emit RefreshRequired();
 }
 
-void MainWindow::SwitchPhotoStream()
+void MainWindow::TurnOnPhotoStream()
 {
-	if (!streamOn)
-	{
-		std::cout << "Wechat Photo Stream ON" << std::endl;
-		streamOn = true;
-		streamtimer->start();
-		photostream->start();
-	}
-	else
-	{
-		std::cout << "Wechat Photo Stream OFF" << std::endl;
-		streamOn = false;
-		streamtimer->stop();
-		photostream->terminate();
-	}
-
+	std::cout << "Wechat Photo Stream ON" << std::endl;
+	streamtimer->start();
+	photostream->start();
 }
 
 void MainWindow::LogIn()
 {
 	clientNetwork->LogIn("facemash2_test");
+	loginPhotoButton->setDisabled(true);
 	addPhotoButton->setDisabled(false);
 	manualRefreshButton->setDisabled(false);
-	enablePhotoStreamButton->setDisabled(false);
+	TurnOnPhotoStream();
 }
 
 void MainWindow::RefreshComplete(QGroupBox *newPhotoSetsBox)

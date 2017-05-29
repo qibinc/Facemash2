@@ -19,7 +19,7 @@ QList<QString> GetFiles(QString dir)
 		else
 		{
 			qDebug() << "localfilemanager:: Warning, Can't Open image" + filename + ", deleted";
-//			QFile::remove(filename);
+			QFile::remove(filename);
 		}
 	}
 	return files;

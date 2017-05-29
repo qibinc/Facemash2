@@ -27,14 +27,13 @@ private:
 	QHBoxLayout *mainLayout;
 	QScrollArea *controlArea, *photoArea;
 	QGroupBox *photoSetsBox;
-	QPushButton *addPhotoButton, *manualRefreshButton, *enablePhotoStreamButton;
+	QPushButton *loginPhotoButton, *addPhotoButton, *manualRefreshButton;
 //  Controller
 	clientnetwork::MyClient *clientNetwork;
 	PhotoSetsController *photoSetsController;
 	QThread *photostream;
 	QObject *streamdisplay;
 	QTimer *streamtimer;
-	bool streamOn;
 
 //	Initialize
 	void InitMainScene();
@@ -49,7 +48,7 @@ signals:
 	void RefreshRequired();
 
 private slots:
-	void SwitchPhotoStream();
+	void TurnOnPhotoStream();
 
 	void LogIn();
 
