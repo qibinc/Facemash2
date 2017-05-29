@@ -104,6 +104,16 @@ bool UserManager::judgePhoto (Date date , QString ID , QString filename) {
     return false;
 }
 
+bool UserManager::unjudgePhoto (Date date , QString ID , QString filename) {
+    for (int i = 0; i < userList.size(); ++i) {
+        if(userList.at(i).getID() == ID){
+            userList[i].unjudge(date, filename);
+            return true;
+        }
+    }
+    return false;
+}
+
 void UserManager::setting (QString settingFile) {
     QSettings setting(settingFile,QSettings::IniFormat);
     setting.beginGroup("users");
@@ -132,6 +142,16 @@ void UserManager::init (QString settingFile) {//todo finish the init
 //        setting.value()
     }
 
+}
+
+QList<QString> UserManager::searchOnlineUsers () {
+    QList<QString> onlineList;
+    for (QList<User>::iterator iter = userList.begin();  iter != userList.end() ; ++iter) {
+        if(iter->isOnline()){
+            onlineList.append(iter->getID());
+        }
+    }
+    return onlineList;
 }
 
 }

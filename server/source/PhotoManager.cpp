@@ -6,38 +6,25 @@
 #include <QSettings>
 #include <QDebug>
 
-using namespace server;
+namespace server {
 
 bool comp(Photo &p1, Photo &p2) {// conpare function, can be extended with multiply sort method
     return (p1.getTotalScore() > p2.getTotalScore());
 }
 
-void Group::sortPhoto(bool (*compare)(Photo &, Photo &)) {
-    std::sort(_album.begin(), _album.end(), compare);
-}
-
-QList<Photo>::iterator Group::search (QString filename) {
-    for (QList<Photo>::iterator i = _album.begin(); i != _album.end(); ++i) {
-        if((*i).getFileName() == filename){
-            return i;
-        }
-    }
-    return _album.end();
-}
-
-QList<Group>::iterator PhotoManager::search (QString groupname) {
-    for (QList<Group>::iterator iter= groups.begin(); iter != groups.end() ; ++iter) {
+    QList<Group>::iterator PhotoManager::search (QString groupname) {
+    for (QList<Group>::iterator iter= _groups.begin(); iter != _groups.end() ; ++iter) {
         if(iter->getGroupName() == groupname){
             return iter;
         }
     }
-    return groups.end();
+    return _groups.end();
 }
 
 void PhotoManager::addPhoto (QString groupname , QString filename , QImage *image) {
     QList<Group>::iterator g = search(groupname);
     Photo photo(filename, image);
-    if(g != groups.end()) {
+    if(g != _groups.end()) {
         QList<Photo>::iterator i = g->search(filename);
         if (i != g->getAlbum().end()) {
             (*i).setImage(*image);
@@ -49,23 +36,23 @@ void PhotoManager::addPhoto (QString groupname , QString filename , QImage *imag
     else{
         QList<Photo> album;
         album.append(photo);
-        groups.append(Group(groupname, &album));
+        _groups.append(Group(groupname, &album));
     }
 };
 
 
-void PhotoManager::addPhotoBatch(QList<Photo> album) {
-    while(!album.isEmpty()){
-        _album.append(album.last());
-        album.pop_back();
-    }
-    sortPhoto(comp);
-}
+//void PhotoManager::addPhotoBatch(QList<Photo> album) {
+//    while(!album.isEmpty()){
+//        _album.append(album.last());
+//        album.pop_back();
+//    }
+//    sortPhoto(comp);
+//}
 
 void PhotoManager::addScoreToPhoto (QString groupname , QString filename , int score , bool isJudging) {
     QList<Group>::iterator g = search(groupname);
-    if(g != groups.end()){
-        QList<Photo>::iterator i = search(filename);
+    if(g != _groups.end()){
+        QList<Photo>::iterator i = g->search(filename);
         if(i != g->getAlbum().end()){
             i->addScore(score , isJudging);
         }
@@ -74,8 +61,8 @@ void PhotoManager::addScoreToPhoto (QString groupname , QString filename , int s
 
 const QImage *PhotoManager::getImage (QString groupname , QString filename , ImageType type) {
     QList<Group>::iterator g = search(groupname);
-    if(g != groups.end()){
-        QList<Photo>::iterator i = search(filename);
+    if(g != _groups.end()){
+        QList<Photo>::iterator i = g->search(filename);
         if(i != g->getAlbum().end()){
             if(type == FullImage) {
                 return (*i).getFullImage();
@@ -88,17 +75,17 @@ const QImage *PhotoManager::getImage (QString groupname , QString filename , Ima
     return NULL;
 }
 
-const QList<Group> *PhotoManager::getImages (QList<QString> groupnames , QList<QString> filenames , ImageType type) {
-    sortPhoto(comp);
-    QList<Group> *tempgroups = new QList<Group>;
-    for (QList<Group>::iterator g = groups.begin(); g != groups.end(); ++g) {
+const QList<SimpleGroup> *PhotoManager::getImages (QList<QString> groupnames , QList<QString> filenames , ImageType type) {
+//    sortPhoto(comp);
+    QList<SimpleGroup> *tempgroups = new QList<SimpleGroup>;
+    for (QList<Group>::iterator g = _groups.begin(); g != _groups.end(); ++g) {
         bool flag1 = true;
         QString groupname = g->getGroupName();
         for(QList<QString>::iterator strg = groupnames.begin(); strg != groupnames.end(); ++strg){
             if((*strg) == groupname){
                 flag1 = false;
 
-                QList<QImage> album;
+                QList<SimplePhoto> album;
                 for (QList<Photo>::iterator iter = g->getAlbum().begin(); iter != g->getAlbum().end(); ++iter) {
                     bool flag2 = true;
                     QString filename = iter->getFileName();
@@ -109,35 +96,63 @@ const QList<Group> *PhotoManager::getImages (QList<QString> groupnames , QList<Q
                         }
                     }
                     if (flag2) {
+                        double score =  (iter->getTotalJudge() == 0) ? 0 : ((double)(iter->getTotalScore())/iter->getTotalJudge());
                         if (type == FullImage) {
-                            album.append(*(iter->getFullImage()));
+                            SimplePhoto sp(filename, iter->getFullImage(), score);
+                            album.append(sp);
                         } else if (type == Thumbnail) {
-                            album.append(*(iter->getThumbnail()));
+                            SimplePhoto sp(filename, iter->getThumbnail(), score);
+                            album.append(sp);
                         }
                     }
                 }
-                tempgroups->append(Group(groupname, &album));
+                tempgroups->append(SimpleGroup(groupname, &album));
                 break;
             }
         }
         if(flag1){
-            tempgroups->append(*g);
+            QList<SimplePhoto> album;
+            for (QList<Photo>::iterator iter = g->getAlbum().begin(); iter != g->getAlbum().end() ; ++iter) {
+                double score =  (iter->getTotalJudge() == 0) ? 0 : ((double)(iter->getTotalScore())/iter->getTotalJudge());
+                if (type == FullImage) {
+                    SimplePhoto sp(iter->getFileName(), iter->getFullImage(), score);
+                    album.append(sp);
+                } else if (type == Thumbnail) {
+                    SimplePhoto sp(iter->getFileName(), iter->getThumbnail(), score);
+                    album.append(sp);
+                }
+            }
+            tempgroups->append(SimpleGroup(groupname, &album));
         }
     }
     return tempgroups;
 }
 
-void PhotoManager::setting (QString settingFile) {
-    QSettings setting(settingFile,QSettings::IniFormat);
-    setting.beginGroup("Photos");
-    int i = 0;
-    for (QList<Photo>::iterator iter = _album.begin(); iter != _album.end() ; ++iter) {
-        setting.beginGroup(QString("photo%1").arg(i++));
-        setting.setValue("filename" , (*iter).getFileName());
-        setting.setValue("storePath" , (*iter).getFileLocation());
-        setting.setValue("score" , (*iter).getTotalScore());
-        setting.setValue("judgeTime" , (*iter).getTotalJudge());
-        setting.endGroup();
+//void PhotoManager::setting (QString settingFile) {
+//    QSettings setting(settingFile,QSettings::IniFormat);
+//    setting.beginGroup("Photos");
+//    int i = 0;
+//    for (QList<Photo>::iterator iter = _album.begin(); iter != _album.end() ; ++iter) {
+//        setting.beginGroup(QString("photo%1").arg(i++));
+//        setting.setValue("filename" , (*iter).getFileName());
+//        setting.setValue("storePath" , (*iter).getFileLocation());
+//        setting.setValue("score" , (*iter).getTotalScore());
+//        setting.setValue("judgeTime" , (*iter).getTotalJudge());
+//        setting.endGroup();
+//    }
+//    setting.endGroup();
+//}
+
+const double PhotoManager::getScore (QString groupname , QString filename) {
+    for(QList<Group>::iterator iter = _groups.begin(); iter != _groups.end(); ++iter){
+        if(iter->getGroupName() == groupname){
+            for(QList<Photo>::const_iterator i = iter->getAlbum().begin(); i != iter->getAlbum().end(); ++i){
+                if (i->getFileName() == filename){
+                    return (double)(i->getTotalScore())/(i->getTotalJudge());
+                }
+            }
+        }
     }
-    setting.endGroup();
+    return -1;
+}
 }

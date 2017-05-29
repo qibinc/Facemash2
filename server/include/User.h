@@ -26,7 +26,7 @@ class Date {
 private:
     int _year, _month, _date, _hour, _minute, _second;
 public:
-    Date(int year = 2017, int month = 5, int date = 1, int s = 0, int min = 0, int h = 0):
+    Date(int year = 2017, int month = 5, int date = 1, int h = 0, int min = 0, int s = 0):
             _year(year), _month(month), _date(date), _hour(h), _minute(min), _second(s)
     {};
 
@@ -98,6 +98,7 @@ public:
     const QString &getNickname () const { return _nickname; }
     const QString &getPassword () const { return _password; }
     int getTotalJudge () const { return totalJudge; }
+    const bool isOnline() const { return online; }
 
     User (Date createDate, QString ID, QString password = QString::null, QString nickname = QString::null):
     _ID(ID), _password(password), _nickname(nickname), errorTime(0), online(false), totalJudge(0)
