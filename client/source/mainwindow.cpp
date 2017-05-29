@@ -3,28 +3,24 @@
 //
 
 #include "mainwindow.h"
+#include <iostream>
 
 namespace client
 {
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), centralWidget(new QWidget())
+MainWindow::MainWindow(QWidget *parent)
+		: QMainWindow(parent), centralWidget(new QWidget()),
+          mainLayout(nullptr)
 {
 	setWindowTitle(tr("Facemash2"));
-	setGeometry(WindowGeometry);
+	setGeometry(WINDOW_GEOMETRY);
 	setCentralWidget(centralWidget);
 //	setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
-	CreateAlbumGroupBox();
-	CreatePhotoGroupBox();
+	InitMainScene();
+	RefreshAlbums();
+	RefreshPhotos();
 
-	QHBoxLayout *mainLayout = new QHBoxLayout;
-
-	mainLayout->addWidget(albumGroupBox);
-	mainLayout->addWidget(photoGroupBox);
-	mainLayout->setStretch(0, 1);
-	mainLayout->setStretch(1, 8);
-
-	centralWidget->setLayout(mainLayout);
 }
 
 MainWindow::~MainWindow()
@@ -32,33 +28,59 @@ MainWindow::~MainWindow()
 	delete centralWidget;
 }
 
-void MainWindow::CreateAlbumGroupBox()
+void MainWindow::InitMainScene()
 {
+	mainLayout = new QHBoxLayout;
+
+	photoArea = new QScrollArea;
+	photoArea->setWidgetResizable(true);
+
+	albumArea = new QScrollArea;
+	albumArea->setWidgetResizable(true);
+
+//	albumController = new AlbumController;
+	photoSetsController = new PhotoSetsController;
+	albumGroupBox = nullptr;
+	photoSetsBox = nullptr;
+
+	mainLayout->addWidget(albumArea);
+	mainLayout->addWidget(photoArea);
+
+	mainLayout->setStretch(0, 1);
+	mainLayout->setStretch(1, 8);
+
+	centralWidget->setLayout(mainLayout);
+}
+
+void MainWindow::RefreshAlbums()
+{
+	if (albumGroupBox != nullptr)
+		delete albumGroupBox;
+
+//	albumGroupBox = albumController->CreateAlbum
+
 	albumGroupBox = new QGroupBox(tr("Albums"));
 	QVBoxLayout *layout = new QVBoxLayout;
 	for (int i = 0; i < NumAlbums; ++i)
 	{
 		albumButtons[i] = new QPushButton(tr("Album %1").arg(i + 1));
-		layout->addWidget(albumButtons[i]);
+		layout->addWidget(albumButtons[i], 0, Qt::AlignTop);
 	}
 	albumGroupBox->setLayout(layout);
+
+	albumArea->setWidget(albumGroupBox);
+
 }
 
-void MainWindow::CreatePhotoGroupBox()
+void MainWindow::RefreshPhotos()
 {
-	photoGroupBox = new QGroupBox(tr("Photos"));
-	QVBoxLayout *layout = new QVBoxLayout;
+	if (photoSetsBox != nullptr)
+		delete photoSetsBox;
 
-	photoGroups = new PhotoGroup*[NumPhotoGroups];
-	for (int i = 0; i < NumPhotoGroups; i++)
-	{
-		const QString photos[5] = {tr("image1.jpg"), tr("image2.jpg"), tr("image3.jpg"), tr("image4.jpg"), tr("image5.jpg")};
+	photoSetsBox = photoSetsController->CreatePhotoSetsBox();
 
-		photoGroups[i] = new PhotoGroup(5, photos, tr("PhotoGroup %1").arg(i + 1));
-		layout->addWidget(photoGroups[i]);
-	}
-
-	photoGroupBox->setLayout(layout);
+	photoArea->setWidget(photoSetsBox);
 }
+
 
 }

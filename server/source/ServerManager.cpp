@@ -29,7 +29,7 @@ QList<QString> server::ServerManager::queryLog (QString userID) {
 
 bool server::ServerManager::uploadPhoto (server::Date date , QString userID , QString filename , QImage *image) {
     if(userManager->upload(date, userID, filename)){
-        photoManager->addPhoto(filename, image);
+        photoManager->addPhoto(QString() , filename , image);
         if(image->save(filename, 0)){
             qDebug()<<"save " + filename + " successful";
         }
@@ -46,22 +46,22 @@ bool server::ServerManager::downloadPhoto (server::Date date , QString userID , 
 }
 
 bool server::ServerManager::judgePhoto (server::Date date , QString userID , QString filename , int score) {
-    photoManager->addScoreToPhoto(filename, score, true);
+    photoManager->addScoreToPhoto(QString() , filename , score , true);
     userManager->judgePhoto(date, userID, filename);
     return true;
 }
 
 bool server::ServerManager::unJudgePhoto (server::Date date , QString userID , QString filename , int score) {
-    photoManager->addScoreToPhoto(filename, score, false);
+    photoManager->addScoreToPhoto(QString() , filename , score , false);
     return true;
 }
 
 const QList<QImage> *server::ServerManager::initClientWithThumbnails (QList<QString> filenames) {
-    return photoManager->getImages(filenames, server::Thumbnail);//todo unnecessary return, after send release the pointer.
+    return photoManager->getImages(QString() , filenames , server::Thumbnail);//todo unnecessary return, after send release the pointer.
 }
 
 const QImage *server::ServerManager::responseWithFullImage (QString filename) {
-    return photoManager->getImage(filename, server::FullImage);
+    return photoManager->getImage(QString() , filename , server::FullImage);
 }
 
 void server::ServerManager::setUserManager (server::UserManager *userManager) {

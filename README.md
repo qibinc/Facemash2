@@ -1,5 +1,10 @@
 # Facemash2
-### Features
+
+*   [Features](#features)
+*   [Installation](#installation)
+*   [Documentation](#documentation)
+
+<h2 id="features">Features</h2>
 
 * 实现照片展现、存储
 * 实现简单的用户系统
@@ -7,7 +12,7 @@
 * 展现照片排名
 * 记录用户操作日志
 
-### Usage
+<h2 id="installation">Installation</h2>
 
 *   CMake, Qt REQUIRED
 
@@ -21,30 +26,9 @@
     make
     ```
 
-* You can find the executables under the folder bin
+* You will find the executables under the folder bin
 
-### Examples
-
-```
-cqb@Cqbs-MacBook-Air:~/developer/Facemash2/build$ cmake .. -DCMAKE_PREFIX_PATH=/usr/local/Cellar/qt/5.8.0_2
--- The C compiler identification is AppleClang 8.1.0.8020038
--- The CXX compiler identification is AppleClang 8.1.0.8020038
--- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc
--- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -- works
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Detecting C compile features
--- Detecting C compile features - done
--- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
--- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -- works
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Detecting CXX compile features
--- Detecting CXX compile features - done
--- Configuring done
--- Generating done
--- Build files have been written to: /Users/cqb/developer/Facemash2/build
-
+<<<<<<< HEAD
 cqb@Cqbs-MacBook-Air:~/developer/Facemash2/build$ make
 Scanning dependencies of target Client_automoc
 [  7%] Automatic moc and uic for target Client
@@ -79,4 +63,8 @@ Scanning dependencies of target server
 [100%] Linking CXX executable ../../bin/server
 [100%] Built target server
 ```
+=======
+<h2 id="documentation">Documentation</h2>
+>>>>>>> origin/client
 
+*   <a href="/client/docs/Documentation-Client.md" title="Client Documentation">Client</a>

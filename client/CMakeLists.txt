@@ -12,7 +12,7 @@ endif()
 
 include_directories(include)
 
-set(SOURCE_FILES source/main.cpp source/mainwindow.cpp include/mainwindow.h libs/uiutility/source/ScreenUnit.cpp libs/uiutility/include/ScreenUnit.h include/photogroup.cpp include/photogroup.h)
+set(SOURCE_FILES source/main.cpp source/mainwindow.cpp include/mainwindow.h libs/uiutility/include/widgetsize.h source/photoset.cpp include/photoset.h source/photosetscontroller.cpp include/photosetscontroller.h)
 add_executable(Client ${SOURCE_FILES})
 
 find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
