@@ -1,9 +1,9 @@
 //
-// Created by 陈齐斌 on 20/05/2017.
+// Created by Qibin Chen on 20/05/2017.
 //
 
-#ifndef CLIENT_PHOTOSET_H
-#define CLIENT_PHOTOSET_H
+#ifndef FACEMASH2_PHOTOSET_H
+#define FACEMASH2_PHOTOSET_H
 
 #include <QtWidgets>
 
@@ -21,21 +21,30 @@ Q_OBJECT
 		PhotosPerRow = 3
 	};
 
+	QList<QString> fileList;
 	int setID;
 
+	QLabel **photos;
+	QWidget **starCheckBoxes;
+	void CreatePhotos(QGridLayout *layout);
+	void CreateStarCheckBoxes(QGridLayout *layout);
 public:
-	PhotoSet(int setID, const int fileNum, const QString fileList[], const QString &title, QWidget *parent = nullptr);
+	PhotoSet(int setID, QList<QString> fileList, const QString &title, QWidget *parent = nullptr);
 
+	QLabel *GetPhoto(int photoID) const;
+
+public slots:
+	void PhotoClicked(int photoID);
+	void PhotoRightClicked(int photoID);
+	void PhotoDoubleClicked(int photoID);
+	void Score(int photoID, int score);
 signals:
 	void photoClicked(int setID, int photoID);
 	void photoDoubleClicked(int setID, int photoID);
 	void photoRightClicked(int setID, int photoID);
-public slots:
-	void PhotoClicked(int i);
-	void PhotoRightClicked(int i);
-	void PhotoDoubleClicked(int i);
+	void photoScored(int setID, int photoID, int score);
 };
 
 }
 
-#endif //CLIENT_PHOTOSET_H
+#endif //FACEMASH2_PHOTOSET_H

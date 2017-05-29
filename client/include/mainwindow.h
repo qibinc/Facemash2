@@ -1,44 +1,61 @@
 //
-// Created by 陈齐斌 on 20/05/2017.
+// Created by Qibin Chen on 20/05/2017.
 //
 
-#ifndef CLIENT_MAINWINDOW_H
-#define CLIENT_MAINWINDOW_H
+#ifndef FACEMASH2_MAINWINDOW_H
+#define FACEMASH2_MAINWINDOW_H
 
 #include <QtWidgets>
-#include "widgetsize.h"
-#include "photosetscontroller.h"
+
+namespace clientnetwork
+{
+class MyClient;
+}
 
 namespace client
 {
+
+class PhotoSetsController;
 
 class MainWindow : public QMainWindow
 {
 Q_OBJECT
 
 private:
-
-//	Components
+//	View
 	QWidget *centralWidget;
 	QHBoxLayout *mainLayout;
-
-	enum
-	{ NumAlbums = 3 };
-	QScrollArea *albumArea;
-	QGroupBox *albumGroupBox;
-//	AlbumController
-	QPushButton *albumButtons[NumAlbums];
-
-	QScrollArea *photoArea;
+	QScrollArea *controlArea, *photoArea;
 	QGroupBox *photoSetsBox;
+	QPushButton *loginPhotoButton, *addPhotoButton, *manualRefreshButton;
+//  Controller
+	clientnetwork::MyClient *clientNetwork;
 	PhotoSetsController *photoSetsController;
+	QThread *photostream;
+	QObject *streamdisplay;
+	QTimer *streamtimer;
 
 //	Initialize
 	void InitMainScene();
 
-//	Refresh
-	void RefreshAlbums();
+	void InitMainControl();
+
+	void InitShortCuts();
+
+	void InitButtons();
+
+signals:
+	void RefreshRequired();
+
+private slots:
+	void TurnOnPhotoStream();
+
+	void LogIn();
+
+public slots:
 	void RefreshPhotos();
+
+	void RefreshComplete(QGroupBox *newPhotoSetsBox);
 
 public:
 	explicit MainWindow(QWidget *parent = nullptr);
@@ -47,4 +64,4 @@ public:
 
 };
 }
-#endif //CLIENT_WIDGET_H
+#endif //FACEMASH2_WIDGET_H

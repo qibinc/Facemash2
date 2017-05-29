@@ -87,6 +87,9 @@ CMakeLists.txt.user*
 *.name
 
 # binary folders
-bin
-client/bin
-server/bin
+#bin
+#client/bin
+#server/bin
+
+*.pkl
+wechat_photo_stream_temp

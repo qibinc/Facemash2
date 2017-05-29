@@ -21,11 +21,12 @@ Documentation - Client
 
 
 <h3 id="mainwindow">MainWindow</h3>
+
 ##### Abstract
 
 *   The Main VIEW of the ui.
 
-##### private
+##### private:
 
 *   InitMainScene
     *   ```c++
@@ -51,7 +52,7 @@ Documentation - Client
     *   Should be called when photos have changed or the view(ex: number of photos per row) has changed.
     *   Similarly, the task is delegated to a photoSetsController. It returns a QGroupBox of PhotoSets, which are QGroupBoxes of PhotoLabels themselves.
 
-##### public
+##### public:
 
 *   MainWindow
     *   ```c++
@@ -67,7 +68,7 @@ Documentation - Client
 
 *   This is the VIEW of a photo set, derived from QGroupBox.
 
-##### public
+##### public:
 
 *   PhotoSet
     *   ```c++
@@ -93,7 +94,7 @@ Documentation - Client
         ```
     *   These slots accept click signals from all photo labels that the photo set contains.
 
-##### signals
+##### signals:
 
 *   photoClicked
     *   ```c++
