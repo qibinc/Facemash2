@@ -27,7 +27,8 @@ public:
     void setting(QString settingFile);
     void init(QString settingFile);
 
-    bool addUser(Date date, QString ID, QString nickname = QString::null, QString password = QString::null);
+    bool addUser(Date date, QString ID, QString password = QString::null, QString nickname = QString::null);
+    QList<QString> searchOnlineUsers();
     bool changeUserPw (Date date , QString ID , QString oldPw , QString newPw);
     void deleteUser(QString ID);
 
@@ -39,6 +40,7 @@ public:
     bool upload(Date date, QString ID, QString filename);
     bool download(Date date, QString ID, QString filename);
     bool judgePhoto(Date date, QString ID, QString filename);
+    bool unjudgePhoto(Date date, QString ID, QString filename);
 };
 
 }

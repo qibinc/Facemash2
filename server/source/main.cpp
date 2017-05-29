@@ -9,11 +9,11 @@
 using namespace std;
 int main(int argc, char* argv[])
 {
-    server::PhotoManager photoManager;
-    server::UserManager userManager;
+//    server::PhotoManager photoManager;
+//    server::UserManager userManager;
     server::ServerManager serverManager;
-    serverManager.setUserManager(&userManager);
-    serverManager.setPhotoManager(&photoManager);
+//    serverManager.setUserManager(&userManager);
+//    serverManager.setPhotoManager(&photoManager);
     server::Date date;
 //    userManager.addUser(date, "ivanium", "nick", "1234");
 //    userManager.download(date, "ivanium", "image1.jpg");
@@ -29,21 +29,21 @@ int main(int argc, char* argv[])
     QImage *image = new QImage(file);
     QString user("ivanium"), user2("qqq");
     serverManager.signUp(date, user);
-    serverManager.login(date, user);
-    serverManager.login(date, user);
+    serverManager.login(date , user , QList<QString>() , QList<QString>() , QString());
+    serverManager.login(date , user , QList<QString>() , QList<QString>() , QString());
     serverManager.logout(date, user);
     serverManager.signUp(date, user2);
 
     serverManager.logout(date, user);
     serverManager.logout(date, user2);
 
-    serverManager.login(date, user2);
-    serverManager.login(date, user);
-    serverManager.uploadPhoto(date, user, file, image);
+    serverManager.login(date , user2 , QList<QString>() , QList<QString>() , QString());
+    serverManager.login(date , user , QList<QString>() , QList<QString>() , QString());
+    serverManager.uploadPhoto(date , user , QString() , file , image);
 //    const QImage *ima = photoManager.getImage(file, server::Thumbnail);
-    serverManager.judgePhoto(date, user, file, 10);
+    serverManager.judgePhoto(date , user , QString() , file , 10);
     qDebug()<<serverManager.queryLog(user);
-    const QList<QImage>* images = serverManager.initClientWithThumbnails();
+//    const QList<QImage>* images = serverManager.initClientWithThumbnails(QList<QString>() , QList<QString>());
     serverManager.backUpSettings();
 //    serverManager.downloadPhoto(date, user, file);
 //    photoManager.addPhoto(file, image);
