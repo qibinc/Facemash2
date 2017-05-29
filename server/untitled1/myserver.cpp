@@ -1,5 +1,6 @@
 #include "myserver.h"
-
+namespace dyh
+{
 MyServer::MyServer(QObject *parent):
     QObject(parent),totalBytes(0),BytesReceived(0)
 {
@@ -135,7 +136,7 @@ void MyServer::SendPoints()
     UpdatePoints(groupnums.size(),groupnums,dates,titles,points);
 }*/
 
-void MyServer::PassAllPhotos(const QString& username, qint32 groupnum, const QList<qint32> &photonums, const QList<QString> &dates, const QList<QImage> &images, const QList<QSize> &sizes, const QList<QString> &titles, const QList<QString> &uploaders, const QList<double> &points)
+void MyServer::PassAllPhotos(const QString& username, qint32 groupnum, const QList<qint32> &photonums, const QList<QString> &dates, const QList<QImage> &images, const QList<QSize> &sizes, const QList<QString> &titles, const QList<double> &points)
 {
     qDebug()<<"pass photos!";
     qDebug()<<photonums.size();
@@ -163,7 +164,7 @@ void MyServer::PassAllPhotos(const QString& username, qint32 groupnum, const QLi
             //qDebug()<<pixmap.isNull();
             //QLabel label;
             //label.setPixmap(pixmap);
-            group._photos.append(Photo(images.at(k), titles.at(k), uploaders.at(k), sizes.at(k), points.at(k)));
+            group._photos.append(Photo(images.at(k), titles.at(k), sizes.at(k), points.at(k)));
             qDebug()<<"here:"<<group._photos.size();
             //group._photos.at(0)._photo.save(QString::number(k) + ".jpg",0,100);
             k++;
@@ -241,4 +242,5 @@ void MyServer::UpdatePoints(const QString& username, qint32 groupnum, const QLis
     qDebug()<<BtArray.size();
     qint64 _size = socket->write(BtArray);
     qDebug()<<_size;
+}
 }

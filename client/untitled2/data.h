@@ -11,13 +11,13 @@ struct Photo
 {
     QImage _photo;
     QString _title;
-    QString _uploader;
+    //QString _uploader;
     QSize _size;
     double _points;
     Photo();
     Photo(const QString& title);
     Photo(const QString& title, double points);
-    Photo(const QImage& photo, const QString& title, const QString& uploader, const QSize& size, double points);
+    Photo(const QImage& photo, const QString& title, const QSize& size, double points);
 };
 
 struct Group

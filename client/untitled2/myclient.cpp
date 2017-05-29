@@ -93,7 +93,7 @@ void MyClient::SavePhotos(User *user)
         return;
     }
 
-    QList<QString> *filepaths = new QList<QString>;
+    QList<QString> filepaths;
 
     QByteArray JsonArray = file->readAll();
     QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
@@ -117,13 +117,13 @@ void MyClient::SavePhotos(User *user)
         for(int j = 0; j < user->_groups.at(i)._photonum; j++)
         {
             QJsonObject inobj2;
-            inobj2.insert("uploader",user->_groups.at(i)._photos.at(j)._uploader);
+            //inobj2.insert("uploader",user->_groups.at(i)._photos.at(j)._uploader);
             inobj2.insert("points",user->_groups.at(i)._photos.at(j)._points);
             //inobj2.insert("type", "small");
             inobj2.insert("width", user->_groups.at(i)._photos.at(j)._size.width());
             inobj2.insert("height", user->_groups.at(i)._photos.at(j)._size.height());
             QString Locate = Prefix + "/" + user->_groups.at(i)._photos.at(j)._title;
-            filepaths->append(Locate);
+            filepaths.append(Locate);
             qDebug()<<Locate;
             if(!user->_groups.at(i)._photos.at(j)._photo.save(Locate,0,100))
                 qDebug()<<"Save Photos Error!";
@@ -306,6 +306,8 @@ void MyClient::UploadOnePhoto(const QString &photopath)
     QString title = QFileInfo(photopath).fileName();
     QImage image(photopath);
 
+    QList<QString> filepaths;
+
     User user;
     user._clienttype = ADD;
     user._groupnum = 1;
@@ -314,7 +316,7 @@ void MyClient::UploadOnePhoto(const QString &photopath)
     Group group;
     group._photonum = 1;
     group._date = QDate::currentDate().toString(Qt::ISODate);
-    group._photos.append(Photo(image,title,UserName,image.size(),0));
+    group._photos.append(Photo(image,title,image.size(),0));
     user._groups.append(group);
 
     QByteArray outArray;
@@ -337,6 +339,7 @@ void MyClient::UploadOnePhoto(const QString &photopath)
     }
     delete dir;
     QFile::copy(photopath, KeepPath + date + "/" + title);//Copy 照片 到本地
+    filepaths.append(KeepPath + date + "/" + title);
 
     QFile *file = new QFile(KeepPath + "config.json");
     if(!file->open(QFile::ReadWrite))
@@ -353,7 +356,7 @@ void MyClient::UploadOnePhoto(const QString &photopath)
     {
         QJsonObject dateobj = object[date].toObject();
         QJsonObject photoobj;
-        photoobj.insert("uploader", UserName);
+        //photoobj.insert("uploader", UserName);
         photoobj.insert("points", 0);
         photoobj.insert("width", image.width());
         photoobj.insert("height", image.height());
@@ -364,7 +367,7 @@ void MyClient::UploadOnePhoto(const QString &photopath)
     {
         QJsonObject dateobj;
         QJsonObject photoobj;
-        photoobj.insert("uploader", UserName);
+        //photoobj.insert("uploader", UserName);
         photoobj.insert("points", 0);
         //photoobj.insert("type", "big");
         photoobj.insert("width", image.width());
@@ -379,6 +382,8 @@ void MyClient::UploadOnePhoto(const QString &photopath)
     file->seek(0);
     file->write(array);
     file->close();
+
+    emit PhotosSaved(filepaths);
 }
 
 void MyClient::EvalPhoto(const QString &date, const QString &title, double points)

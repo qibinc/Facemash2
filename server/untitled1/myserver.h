@@ -5,7 +5,8 @@
 #include <QtNetwork/QTcpSocket>
 #include "data.h"
 #include <QFile>
-
+namespace dyh
+{
 class MyServer : public QObject
 {
     Q_OBJECT
@@ -42,7 +43,7 @@ public:
 
     void PassAllPhotos(const QString& username, qint32 groupnum, const QList<qint32>& photonums, const QList<QString>& dates,
                        const QList<QImage>& images, const QList<QSize>& sizes, const QList<QString>& titles,
-                       const QList<QString>& uploaders, const QList<double>& points);   //传照片（可单张也可多张）
+                       const QList<double>& points);   //传照片（可单张也可多张）
     //void PassOnePhoto(const QString& date, const QString& filepath, const QString& title,
                       //const QString& uploader, const double& points);  //传某张照片
     void PassUserLog(const QString& username, const QString& log);  //传用户日志
@@ -52,5 +53,5 @@ public:
 
     //void SetPath(const QString& path);//设置缓存文件保存路径
 };
-
+}
 #endif // MYSERVER_H

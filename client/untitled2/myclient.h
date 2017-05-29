@@ -40,7 +40,7 @@ private slots:
 
 signals:
     void Received(User*);
-    void PhotosSaved(QList<QString>*);
+    void PhotosSaved(QList<QString>);
     void LogSaved();
     void PointsUpdated();
 
