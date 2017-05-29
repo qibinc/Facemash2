@@ -7,6 +7,7 @@
 
 #include "UserManager.h"
 #include "PhotoManager.h"
+#include <QSettings>
 
 enum UserStatus{
     succeed,
@@ -22,18 +23,29 @@ private:
     UserManager *userManager;
     PhotoManager *photoManager;
 public:
-    UserStatus logup(Date date, QString userID, QString password);
-    UserStatus login(Date date, QString UserID, QString password);
-    UserStatus logout(Date date, QString UserID);
+    void setUserManager (UserManager *userManager);
 
-    bool uploadPhoto(Date date, QString userID, QString filename);
+    void setPhotoManager (PhotoManager *photoManager);
+
+public:
+    void backUpSettings();
+    void initWithSettings ();
+
+    UserStatus signUp (Date date , QString userID , QString password = QString::null);
+    UserStatus login(Date date, QString UserID, QString password = QString::null);
+    UserStatus logout(Date date, QString UserID);
+    QList<QString> queryLog(QString userID);
+
+    bool uploadPhoto (server::Date date , QString userID , QString filename , QImage *image);
     bool downloadPhoto(Date date, QString userID, QString filename);
 
     bool judgePhoto(Date date, QString userID, QString filename, int score);
     bool unJudgePhoto(Date date, QString userID, QString filename, int score);
 
-    const QList<QImage> *initClientWithThumbnails();
+    const QList<QImage> *initClientWithThumbnails (QList<QString> filenames = QList<QString>());
     const QImage *responseWithFullImage(QString filename);
+
+//    parseData()
 };
 
 }

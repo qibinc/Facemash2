@@ -21,12 +21,22 @@ enum ImageType{
     Thumbnail
 };
 
+class Group{
+private:
+    QString groupName;
+    QList<Photo> _album;
+public:
+    const QString &getGroupName () const { return groupName; }
+    QList<Photo> &getAlbum() { return  _album; };
+};
+
 class PhotoManager {
 private:
     QList<Photo> _album;
 
     QList<Photo>::iterator search(QString filename);
 public:
+    void setting(QString settingFile);
 //    PhotoManager(){};
 //        void updatePhoto(info clientInfo){};
     void addPhoto(QString filename, QImage *image);
@@ -41,14 +51,6 @@ public:
 //    QImage *getThumbnail(QString filename);
 //    QList<QImage> *getThumbnails(QList<QString> filenames);
 };
-
-
-//Photo PhotoManager::PhotoResize(Photo &HDPhoto, int width, int height) {
-//    QString resizedPhotoName = "resized" + HDPhoto.getFileName();
-//    QImage resizedImage(HDPhoto.resize(width, height));
-//    Photo resizedPhoto(resizedPhotoName, &resizedImage);
-//    return resizedPhoto;
-//}
 
 }
 #endif //FACEMASH2_PHOTOSYSTEM_H

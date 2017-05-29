@@ -24,11 +24,9 @@ public:
     Photo(QString fileName, QImage *image = NULL);
 
     const QString &getFileName() const { return _fileName; }
-
     const QString &getFileLocation() const { return _fileLocation; }
-
     const int getTotalScore() const { return totalScore; }
-
+    const int getTotalJudge() const { return judgeTime;  }
     const QImage *getFullImage() const { return &_fullImage; }
     const QImage *getThumbnail() const { return &_thumbnail; }
 

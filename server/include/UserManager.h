@@ -7,6 +7,7 @@
 
 #include <QList>
 #include <QString>
+#include <QSettings>
 
 #include "User.h"
 #include "Photo.h"
@@ -16,23 +17,28 @@ namespace server {
 class UserManager {
 private:
     QList<User> userList;
-    QString ad_ID;
-    QString ad_password;
+//    QString ad_ID;
+//    QString ad_password;
 
 public:
 //    void addID(QString ID, QString password = QString::null);//todo finish admin system
 //    void deleteID(QString ID);
 //    void changeIDPassword(QString ID, QString oldPw, QString newPw);
+    void setting(QString settingFile);
+    void init(QString settingFile);
 
     bool addUser(Date date, QString ID, QString nickname = QString::null, QString password = QString::null);
-    bool changeUerPw(Date date, QString ID, QString oldPw, QString newPw);
+    bool changeUserPw (Date date , QString ID , QString oldPw , QString newPw);
     void deleteUser(QString ID);
 
     bool login(Date date, QString ID, QString password = QString::null);
     void logout(Date date, QString ID);
 
+    const QList<QString> queryLog (QString userID);
+
     bool upload(Date date, QString ID, QString filename);
     bool download(Date date, QString ID, QString filename);
+    bool judgePhoto(Date date, QString ID, QString filename);
 };
 
 }

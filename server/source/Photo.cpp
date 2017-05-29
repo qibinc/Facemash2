@@ -4,14 +4,14 @@
 
 #include "Photo.h"
 
-#define minPhotoWidth 90
-#define minPhotoHeight 160
+#define minPhotoWidth 100
+#define minPhotoHeight 100
 
 namespace server {
 
     Photo::Photo (QString fileName , QImage *image) :
-            _fileName(fileName) , _fileLocation(".\\" + _fileName),
-            totalScore(0) , _fullImage(*image) {
+            _fileName(fileName) , _fileLocation(".\\" + fileName),
+            totalScore(0) , judgeTime(0), _fullImage(*image) {
         resize();
     };
 //
@@ -26,7 +26,7 @@ namespace server {
 
     void Photo::resize () {
 //    if(_fullImage){
-        _thumbnail = QImage(_fullImage.scaled(minPhotoWidth , minPhotoHeight));
+        _thumbnail = QImage(_fullImage.scaled(minPhotoWidth , minPhotoHeight, Qt::KeepAspectRatio));
 //    }
     }
 

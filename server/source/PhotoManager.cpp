@@ -3,6 +3,7 @@
 //
 
 #include "PhotoManager.h"
+#include <QSettings>
 #include <QDebug>
 
 using namespace server;
@@ -66,8 +67,39 @@ const QImage *PhotoManager::getImage(QString filename, ImageType type){
 const QList<QImage> *PhotoManager::getImages (QList<QString> filenames, ImageType type) {
     sortPhoto(comp);
     QList<QImage> *album = new QList<QImage>;
-    for (QList<QString>::iterator stri = filenames.begin(); stri != filenames.end() ; ++stri) {
-        album->append(*getImage((*stri), type));
+
+    for (QList<Photo>::iterator iter = _album.begin(); iter != _album.end() ; ++iter) {
+        bool flag = true;
+        QString name = iter->getFileName();
+        for (QList<QString>::iterator stri = filenames.begin(); stri != filenames.end() ; ++stri) {
+            if((*stri) == name){
+                flag = false;
+                break;
+            }
+        }
+        if(flag){
+            if(type == FullImage){
+                album->append(*(iter->getFullImage()));
+            }
+            else if (type == Thumbnail){
+                album->append(*(iter->getThumbnail()));
+            }
+        }
     }
     return album;
+}
+
+void PhotoManager::setting (QString settingFile) {
+    QSettings setting(settingFile,QSettings::IniFormat);
+    setting.beginGroup("Photos");
+    int i = 0;
+    for (QList<Photo>::iterator iter = _album.begin(); iter != _album.end() ; ++iter) {
+        setting.beginGroup(QString("photo%1").arg(i++));
+        setting.setValue("filename" , (*iter).getFileName());
+        setting.setValue("storePath" , (*iter).getFileLocation());
+        setting.setValue("score" , (*iter).getTotalScore());
+        setting.setValue("judgeTime" , (*iter).getTotalJudge());
+        setting.endGroup();
+    }
+    setting.endGroup();
 }
