@@ -14,9 +14,18 @@ class PhotoWindow : public QMainWindow
 Q_OBJECT
 
 private:
-	QPixmap photoPixmap;
+	bool isStream;
+	QSize originalSize;
 	QLabel *centralLabel;
 	QPoint mouseStartLocation, windowStartLocation;
+
+	void SetPhoto(QString photoFileName);
+
+	void SetAnimation();
+
+private slots:
+	void Vanish();
+
 protected:
 	void keyReleaseEvent(QKeyEvent *event) override;
 
@@ -31,7 +40,7 @@ protected:
 	void keyPressEvent(QKeyEvent *event) override;
 
 public:
-	PhotoWindow(QPixmap photoPixmap, QWidget *parent = nullptr);
+	PhotoWindow(QString photoFileName, bool isStream = false, QWidget *parent = nullptr);
 
 	virtual ~PhotoWindow();
 

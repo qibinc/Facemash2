@@ -7,18 +7,13 @@ int main()
 	for (auto dirname : dirs)
 	{
 		std::cout << dirname.toStdString() << std::endl;
-		QList<QString> files;
-		files = localfilemanager::GetFiles(dirname);
+		QList<QString> files = localfilemanager::GetFiles(dirname);
 		for (auto filename : files)
 		{
 			std::cout << "\t" << filename.toStdString() << std::endl;
 		}
 		std::cout << std::endl;
-
 	}
-
-
-
 
 	return 0;
 }

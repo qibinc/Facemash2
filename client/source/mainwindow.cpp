@@ -62,6 +62,14 @@ void MainWindow::InitMainScene()
 	mainLayout->setStretch(1, 8);
 
 	centralWidget->setLayout(mainLayout);
+
+	streamdisplay = new photostream::StreamDisplay(QDate::currentDate().toString("yyyy.MM.dd") + "/", "wechat_photo_stream_temp/", this);
+
+	streamtimer = new QTimer;
+	streamtimer->setInterval(100);
+	connect(streamtimer, SIGNAL(timeout()), streamdisplay, SLOT(Refresh()));
+	photostream = new photostream::WechatStream(this);
+
 }
 
 void MainWindow::RefreshUsers()
@@ -102,15 +110,7 @@ void MainWindow::SwitchPhotoStream()
 	{
 		std::cout << "Wechat Photo Stream ON" << std::endl;
 		streamOn = true;
-		photostream = new photostream::WechatStream(this);
-		streamdisplay = new photostream::StreamDisplay(QDate::currentDate().toString(), "wechat_photo_stream_temp/", this);
-
-		streamtimer = new QTimer;
-		streamtimer->setInterval(100);
-//		streamtimer->moveToThread(streamdisplaythread);
-		connect(streamtimer, SIGNAL(timeout()), streamdisplay, SLOT(Refresh()));
 		streamtimer->start();
-
 		photostream->start();
 	}
 	else

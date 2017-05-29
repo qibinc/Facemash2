@@ -21,11 +21,15 @@ Q_OBJECT
 		PhotosPerRow = 3
 	};
 
-	int setID, numberOfPhoto;
+	QList<QString> fileList;
+	int setID;
 
 	QLabel **photos;
+	QWidget **starCheckBoxes;
+	void CreatePhotos(QGridLayout *layout);
+	void CreateStarCheckBoxes(QGridLayout *layout);
 public:
-	PhotoSet(int setID, const int fileNum, QString *fileList, const QString &title, QWidget *parent = nullptr);
+	PhotoSet(int setID, QList<QString> fileList, const QString &title, QWidget *parent = nullptr);
 
 	QLabel *GetPhoto(int photoID) const;
 

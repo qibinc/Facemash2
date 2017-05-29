@@ -6,7 +6,6 @@
 #define FACEMASH2_MAINWINDOW_H
 
 #include <QtWidgets>
-#include <libs/photostream/include/wechatstream.h>
 
 namespace client
 {

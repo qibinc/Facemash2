@@ -16,8 +16,7 @@ class PhotoSetsController : public QWidget
 {
 Q_OBJECT
 	int selectedSetID, selectedPhotoID;
-	int numberOfPhotoSet, *numberOfPhotoEverySet;
-	QString **photoSetFiles;
+	QList<QList<QString>> photoSetFiles;
 	PhotoSet **photoSets;
 	QMenu *menu;
 public:

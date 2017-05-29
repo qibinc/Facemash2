@@ -9,16 +9,16 @@ namespace photostream
 {
 
 WechatStream::WechatStream(QObject *parent) : QThread(parent)
-{}
+{
+}
 
 void WechatStream::run()
 {
-	char py[] = "main.py";
-	FILE* fp = fopen(py, "r");
+	pycode = fopen("main.py", "r");
+	qDebug() << pycode;
 
 	Py_Initialize();
-	PyRun_SimpleFile(fp, py);
-	Py_Finalize();
+	PyRun_SimpleFile(pycode, "main.py");
 }
 
 }

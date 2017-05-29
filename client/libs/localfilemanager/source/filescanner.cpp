@@ -3,6 +3,7 @@
 //
 
 #include "filescanner.h"
+
 namespace localfilemanager
 {
 
@@ -13,8 +14,13 @@ QList<QString> GetFiles(QString dir)
 	while (iter.hasNext())
 	{
 		QString &&filename = iter.next();
-		if (!OpenImage(filename).isNull())
+		if (!OpenImage(filename)->isNull())
 			files.append(filename);
+		else
+		{
+			qDebug() << "localfilemanager:: Warning, Can't Open image" + filename + ", deleted";
+//			QFile::remove(filename);
+		}
 	}
 	return files;
 }
@@ -34,15 +40,25 @@ QList<QString> GetDirs(QString dir)
 	return dirs;
 };
 
-QPixmap OpenImage(QString filename)
+QPixmap *OpenImage(QString filename)
 {
-	QPixmap pixmap(filename);
-	if (pixmap.isNull())
+	QPixmap *pixmap = new QPixmap(filename);
+	if (pixmap->isNull())
 	{
-		pixmap.load(filename, "JPG");
+		pixmap->load(filename, "JPG");
+	}
+	if (pixmap->isNull())
+	{
+		pixmap->load(filename, "PNG");
 	}
 	return pixmap;
 }
 
+QMovie *OpenMovie(QString filename)
+{
+	QMovie *gif = new QMovie(filename);
+	gif->start();
+	return gif;
+}
 
 }

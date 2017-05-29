@@ -92,5 +92,4 @@ CMakeLists.txt.user*
 #server/bin
 
 *.pkl
-bin/style.qss
 wechat_photo_stream_temp

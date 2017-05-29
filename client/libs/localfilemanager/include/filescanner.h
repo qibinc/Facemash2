@@ -14,7 +14,9 @@ QList<QString> GetDirs(QString dir);
 
 QList<QString> GetFiles(QString dir);
 
-QPixmap OpenImage(QString filename);
+QPixmap *OpenImage(QString filename);
+
+QMovie *OpenMovie(QString filename);
 
 }
 

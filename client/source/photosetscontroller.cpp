@@ -15,37 +15,29 @@ namespace client
 
 PhotoSetsController::PhotoSetsController(QWidget *parent) : QWidget(parent)
 {
-
 	menu = new uiutility::PhotoEditMenu(this);
 }
 
 QGroupBox *PhotoSetsController::CreatePhotoSetsBox()
 {
 	QList<QString> dirs = localfilemanager::GetDirs(".");
-	numberOfPhotoSet = dirs.size();
-	photoSetFiles = new QString*[numberOfPhotoSet];
 
-	numberOfPhotoEverySet = new int[numberOfPhotoSet];
-
-	for (int i = 0; i < numberOfPhotoSet; ++i)
+	for (int i = 0; i < dirs.size(); ++i)
 	{
 		QList<QString> files = localfilemanager::GetFiles(dirs.value(i));
-		numberOfPhotoEverySet[i] = files.size();
-		photoSetFiles[i] = new QString[numberOfPhotoEverySet[i]];
 
-		for (int j = 0; j < numberOfPhotoEverySet[i]; ++j)
-			photoSetFiles[i][j] = files.value(j);
+		photoSetFiles.append(files);
 	}
 
 	selectedSetID = selectedPhotoID = -1;
 
-	photoSets = new PhotoSet *[numberOfPhotoSet];
+	photoSets = new PhotoSet *[photoSetFiles.size()];
 	QGroupBox *photoSetsBox = new QGroupBox(tr("Photos"));
 	QVBoxLayout *layout = new QVBoxLayout;
 
-	for (int i = 0; i < numberOfPhotoSet; i++)
+	for (int i = 0; i < photoSetFiles.size(); ++i)
 	{
-		photoSets[i] = new PhotoSet(i, numberOfPhotoEverySet[i], photoSetFiles[i], tr("PhotoSet %1").arg(i + 1));
+		photoSets[i] = new PhotoSet(i, photoSetFiles.value(i), QDir(dirs.value(i)).dirName());
 		layout->addWidget(photoSets[i], 0, Qt::AlignTop);
 		connect(photoSets[i], SIGNAL(photoClicked(int, int)), this, SLOT(PhotoClicked(int, int)));
 		connect(photoSets[i], SIGNAL(photoRightClicked(int, int)), this, SLOT(PhotoRightClicked(int, int)));
@@ -58,8 +50,8 @@ QGroupBox *PhotoSetsController::CreatePhotoSetsBox()
 
 void PhotoSetsController::PhotoClicked(int setID, int photoID)
 {
-	if (0 <= selectedSetID && selectedSetID < numberOfPhotoSet
-	    && 0 <= selectedPhotoID && selectedPhotoID < numberOfPhotoEverySet[selectedSetID])
+	if (0 <= selectedSetID && selectedSetID < photoSetFiles.size()
+	    && 0 <= selectedPhotoID && selectedPhotoID < photoSetFiles.value(selectedSetID).size())
 		photoSets[selectedSetID]->GetPhoto(selectedPhotoID)->setStyleSheet(tr("border: %1px outset transparent").arg(SCREEN_UNIT * 1.5));
 
 	selectedSetID = setID;
@@ -77,14 +69,14 @@ void PhotoSetsController::PhotoRightClicked(int setID, int photoID)
 
 void PhotoSetsController::PhotoDoubleClicked(int setID, int photoID)
 {
-	uiutility::PhotoWindow *photo = new uiutility::PhotoWindow(localfilemanager::OpenImage(photoSetFiles[setID][photoID]), this);
+	uiutility::PhotoWindow *photo = new uiutility::PhotoWindow(photoSetFiles[setID][photoID], 0, this);
 	photo->show();
 }
 
 void PhotoSetsController::CopyPhotoFile()
 {
-	if (0 <= selectedSetID && selectedSetID < numberOfPhotoSet
-			&& 0 <= selectedPhotoID && selectedPhotoID < numberOfPhotoEverySet[selectedSetID])
+	if (0 <= selectedSetID && selectedSetID < photoSetFiles.size()
+			&& 0 <= selectedPhotoID && selectedPhotoID < photoSetFiles.value(selectedSetID).size())
 		QApplication::clipboard()->setPixmap(QPixmap(photoSetFiles[selectedSetID][selectedPhotoID]));
 }
 

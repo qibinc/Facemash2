@@ -4,32 +4,23 @@
 
 #include "widgetsize.h"
 #include "photowindow.h"
-#include <iostream>
+#include "filescanner.h"
 
 namespace uiutility
 {
 
-PhotoWindow::PhotoWindow(QPixmap photoPixmap, QWidget *parent)
-		: QMainWindow(parent, Qt::Window | Qt::FramelessWindowHint)
+PhotoWindow::PhotoWindow(QString photoFileName, bool isStream, QWidget *parent)
+		: QMainWindow(parent, Qt::Window | Qt::FramelessWindowHint ), isStream(isStream)
 {
-	centralLabel = new QLabel;
-	centralLabel->setScaledContents(true);
-	if (photoPixmap.width() > PHOTO_LABEL_SIZE.width() * 2)
-	{
-		photoPixmap = photoPixmap.scaled(photoPixmap.size() / photoPixmap.width() * PHOTO_LABEL_SIZE.width() * 2, Qt::KeepAspectRatio, Qt::FastTransformation);
-	}
-	centralLabel->setPixmap(photoPixmap);
-	centralLabel->resize(photoPixmap.size());
-	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-	setCentralWidget(centralLabel);
-	setFixedSize(centralLabel->size());
-	move(QCursor::pos().x() - size().width() / 2, QCursor::pos().y() - size().height() / 2);
+	setAttribute(Qt::WA_NoSystemBackground, true);
+	setAttribute(Qt::WA_TranslucentBackground, true);
 
-	QPropertyAnimation *animation = new QPropertyAnimation(this, "windowOpacity", this);
-	animation->setDuration(500);
-	animation->setStartValue(0);
-	animation->setEndValue(1);
-	animation->start();
+	SetPhoto(photoFileName);
+
+	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+	setFixedSize(centralLabel->size());
+
+	SetAnimation();
 }
 
 PhotoWindow::~PhotoWindow()
@@ -50,12 +41,7 @@ void PhotoWindow::mouseMoveEvent(QMouseEvent *event)
 
 void PhotoWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	QPropertyAnimation *animation = new QPropertyAnimation(this, "windowOpacity", this);
-	animation->setDuration(500);
-	animation->setStartValue(windowOpacity());
-	animation->setEndValue(0);
-	animation->start();
-	connect(animation, SIGNAL(finished()), this, SLOT(close()));
+	Vanish();
 }
 
 void PhotoWindow::wheelEvent(QWheelEvent *event)
@@ -80,7 +66,7 @@ void PhotoWindow::keyPressEvent(QKeyEvent *event)
 			setFixedSize(centralLabel->size());
 			break;
 		case Qt::Key_0:
-			centralLabel->resize(photoPixmap.size());
+			centralLabel->resize(originalSize);
 			setFixedSize(centralLabel->size());
 			break;
 		default:
@@ -93,13 +79,74 @@ void PhotoWindow::keyReleaseEvent(QKeyEvent *event)
 {
 	if (event->key() == Qt::Key_Space)
 	{
-		QPropertyAnimation *animation = new QPropertyAnimation(this, "windowOpacity", this);
-		animation->setDuration(500);
-		animation->setStartValue(windowOpacity());
-		animation->setEndValue(0);
-		animation->start();
-		connect(animation, SIGNAL(finished()), this, SLOT(close()));
+		Vanish();
 	}
+}
+
+void PhotoWindow::SetPhoto(QString photoFileName)
+{
+	centralLabel = new QLabel;
+	centralLabel->setAttribute(Qt::WA_TranslucentBackground, true);
+	centralLabel->setScaledContents(true);
+
+	if (QFileInfo(photoFileName).suffix() == "gif")
+	{
+		QMovie *gif = localfilemanager::OpenMovie(photoFileName);
+		if (gif->isValid())
+		{
+//			gif->setScaledSize(gif->currentPixmap().size().scaled(PHOTO_LABEL_SIZE, Qt::KeepAspectRatio));
+			centralLabel->resize(gif->currentPixmap().size());
+			centralLabel->setMovie(gif);
+			originalSize = centralLabel->size();
+			setCentralWidget(centralLabel);
+			return;
+		}
+	}
+	QPixmap *photoPixmap = localfilemanager::OpenImage(photoFileName);
+	if (photoPixmap->width() > PHOTO_LABEL_SIZE.width() * 2 || photoPixmap->height() > PHOTO_LABEL_SIZE.height() * 2)
+	{
+		*photoPixmap = photoPixmap->scaled(PHOTO_LABEL_SIZE * 2, Qt::KeepAspectRatio, Qt::FastTransformation);
+	}
+	centralLabel->resize(photoPixmap->size());
+	centralLabel->setPixmap(*photoPixmap);
+	delete photoPixmap;
+	originalSize = centralLabel->size();
+	setCentralWidget(centralLabel);
+
+}
+
+void PhotoWindow::SetAnimation()
+{
+	QPropertyAnimation *animation = new QPropertyAnimation(this, "windowOpacity", this);
+	animation->setDuration(500);
+	animation->setStartValue(0);
+	animation->setEndValue(1);
+	animation->start();
+
+	if (isStream)
+	{
+		int &&y = rand() % (SCREEN_UNIT * 200);
+		QPropertyAnimation *streamAnimation = new QPropertyAnimation(this, "pos", this);
+		streamAnimation->setDuration(5000);
+		streamAnimation->setStartValue(QPoint(SCREEN_UNIT * 480, y));
+		streamAnimation->setEndValue(QPoint(0, y));
+		streamAnimation->start();
+		connect(streamAnimation, SIGNAL(finished()), this, SLOT(Vanish()));
+	}
+	else
+	{
+		move(QCursor::pos().x() - size().width() / 2, QCursor::pos().y() - size().height() / 2);
+	}
+}
+
+void PhotoWindow::Vanish()
+{
+	QPropertyAnimation *animation = new QPropertyAnimation(this, "windowOpacity", this);
+	animation->setDuration(500);
+	animation->setStartValue(windowOpacity());
+	animation->setEndValue(0);
+	animation->start();
+	connect(animation, SIGNAL(finished()), this, SLOT(close()));
 }
 
 

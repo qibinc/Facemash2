@@ -12,6 +12,8 @@ namespace photostream
 
 class WechatStream : public QThread
 {
+	FILE* pycode;
+
 protected:
 	void run() override ;
 
