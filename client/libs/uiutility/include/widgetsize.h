@@ -1,5 +1,5 @@
 //
-// Created by 陈齐斌 on 20/05/2017.
+// Created by Qibin Chen on 20/05/2017.
 //
 
 #ifndef UIUTILITY_WIDGETSIZE_H

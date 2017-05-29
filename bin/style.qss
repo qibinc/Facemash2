@@ -1,0 +1,250 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) <2013-2014> <Colin Duquesnoy>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+QWidget
+{
+    color: #eff0f1;
+    background-color: #31363b;
+    selection-background-color:#3daee9;
+    selection-color: #eff0f1;
+    background-clip: border;
+    border-image: none;
+    border: 0px transparent black;
+    outline: 0;
+}
+
+QWidget:item:hover
+{
+    background-color: #18465d;
+    color: #eff0f1;
+}
+
+QWidget:item:selected
+{
+    background-color: #18465d;
+}
+
+QCheckBox
+{
+    spacing: 5px;
+    outline: none;
+    color: #eff0f1;
+    margin-bottom: 2px;
+}
+
+QCheckBox:disabled
+{
+    color: #76797C;
+}
+
+QCheckBox::indicator,
+QGroupBox::indicator
+{
+    width: 18px;
+    height: 18px;
+}
+QGroupBox::indicator
+{
+    margin-left: 2px;
+}
+
+QCheckBox::indicator:unchecked
+{
+    image: url(unstar.png);
+}
+
+QCheckBox::indicator:unchecked:hover,
+QCheckBox::indicator:unchecked:focus,
+QCheckBox::indicator:unchecked:pressed,
+QGroupBox::indicator:unchecked:hover,
+QGroupBox::indicator:unchecked:focus,
+QGroupBox::indicator:unchecked:pressed
+{
+    border: none;
+    image: url(star.png);
+}
+
+QCheckBox::indicator:checked
+{
+    image: url(star.png);
+}
+
+QCheckBox::indicator:checked:hover,
+QCheckBox::indicator:checked:focus,
+QCheckBox::indicator:checked:pressed,
+QGroupBox::indicator:checked:hover,
+QGroupBox::indicator:checked:focus,
+QGroupBox::indicator:checked:pressed
+{
+  border: none;
+    image: url(star.png);
+}
+
+QGroupBox {
+    border:1px solid #76797C;
+    border-radius: 2px;
+    margin-top: 20px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+}
+
+QAbstractScrollArea
+{
+    border-radius: 2px;
+    border: 1px solid #76797C;
+    background-color: transparent;
+}
+
+QScrollBar:horizontal
+{
+    height: 15px;
+    margin: 3px 15px 3px 15px;
+    border: 1px transparent #2A2929;
+    border-radius: 4px;
+    background-color: #2A2929;
+}
+
+QScrollBar::handle:horizontal
+{
+    background-color: #605F5F;
+    min-width: 5px;
+    border-radius: 4px;
+}
+
+
+QScrollBar:vertical
+{
+    background-color: #2A2929;
+    width: 15px;
+    margin: 15px 3px 15px 3px;
+    border: 1px transparent #2A2929;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical
+{
+    background-color: #605F5F;
+    min-height: 5px;
+    border-radius: 4px;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
+{
+    background: none;
+}
+
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
+{
+    background: none;
+}
+
+QMainWindow::separator
+{
+    background-color: #31363b;
+    color: white;
+    padding-left: 4px;
+    spacing: 2px;
+    border: 1px dashed #76797C;
+}
+
+QMainWindow::separator:hover
+{
+
+    background-color: #787876;
+    color: white;
+    padding-left: 4px;
+    border: 1px solid #76797C;
+    spacing: 2px;
+}
+
+
+QMenu::separator
+{
+    height: 1px;
+    background-color: #76797C;
+    color: white;
+    padding-left: 4px;
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+QPushButton
+{
+    color: #eff0f1;
+    background-color: #31363b;
+    border-width: 1px;
+    border-color: #76797C;
+    border-style: solid;
+    padding: 5px;
+    border-radius: 2px;
+    outline: none;
+}
+
+QPushButton:disabled
+{
+    background-color: #31363b;
+    border-width: 1px;
+    border-color: #454545;
+    border-style: solid;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 2px;
+    color: #454545;
+}
+
+QPushButton:focus {
+    background-color: #3daee9;
+    color: white;
+}
+
+QPushButton:hover
+{
+    background-color: #3daee9;
+}
+
+QPushButton:pressed
+{
+    background-color: #3daee9;
+    padding-top: -15px;
+    padding-bottom: -17px;
+}
+
+QPushButton:checked{
+    background-color: #76797C;
+    border-color: #6A6969;
+}
+
+QLabel
+{
+    border: 0px solid black;
+}

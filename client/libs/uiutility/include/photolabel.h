@@ -1,5 +1,5 @@
 //
-// Created by 陈齐斌 on 21/05/2017.
+// Created by Qibin Chen on 21/05/2017.
 //
 
 #ifndef UIUTILITY_PHOTOLABEL_H
@@ -16,6 +16,9 @@ Q_OBJECT
 public:
 	PhotoLabel(int photoID, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 
+	void Select();
+
+	void DeSelect();
 private:
 	int photoID;
 
