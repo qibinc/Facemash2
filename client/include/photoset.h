@@ -7,6 +7,11 @@
 
 #include <QtWidgets>
 
+namespace clientnetwork
+{
+class MyClient;
+}
+
 namespace client
 {
 
@@ -26,10 +31,12 @@ Q_OBJECT
 
 	QLabel **photos;
 	QWidget **starCheckBoxes;
+	clientnetwork::MyClient *clientNetwork;
+	QString dirname;
 	void CreatePhotos(QGridLayout *layout);
 	void CreateStarCheckBoxes(QGridLayout *layout);
 public:
-	PhotoSet(int setID, QList<QString> fileList, const QString &title, QWidget *parent = nullptr);
+	PhotoSet(clientnetwork::MyClient *clientNetwork, int setID, QList<QString> fileList, const QString &title, QWidget *parent = nullptr);
 
 	QLabel *GetPhoto(int photoID) const;
 
@@ -42,7 +49,7 @@ signals:
 	void photoClicked(int setID, int photoID);
 	void photoDoubleClicked(int setID, int photoID);
 	void photoRightClicked(int setID, int photoID);
-	void photoScored(int setID, int photoID, int score);
+//	void photoScored(int setID, int photoID, int score);
 };
 
 }

@@ -8,12 +8,13 @@
 #include "starcheck.h"
 #include "photowindow.h"
 #include "filescanner.h"
+#include "myclient.h"
 
 namespace client
 {
 
-PhotoSet::PhotoSet(int setID, QList<QString> fileList, const QString &title, QWidget *parent)
-		: QGroupBox(title, parent), setID(setID), fileList(fileList)
+PhotoSet::PhotoSet(clientnetwork::MyClient *clientNetwork, int setID, QList<QString> fileList, const QString &title, QWidget *parent)
+		: clientNetwork(clientNetwork), QGroupBox(title, parent), setID(setID), fileList(fileList), dirname(title)
 
 {
 	QGridLayout *layout = new QGridLayout;
@@ -56,7 +57,7 @@ void PhotoSet::CreateStarCheckBoxes(QGridLayout *layout)
 	int i;
 	for (i = 0; i < fileList.size(); ++i)
 	{
-		starCheckBoxes[i] = new uiutility::StarCheck(i, photos[i]);
+		starCheckBoxes[i] = new uiutility::StarCheck(clientNetwork->AskforOnePoints(dirname, QFileInfo(fileList[i]).fileName()), i, photos[i]);
 		connect(starCheckBoxes[i], SIGNAL(score(int, int)), this, SLOT(Score(int, int)));
 		layout->addWidget(starCheckBoxes[i], i / PhotosPerRow * 2 + 1, i % PhotosPerRow, 1, 1, Qt::AlignCenter);
 //		connect(starCheckBoxes[i], SIGNAL(clicked(int)), this, SLOT(PhotoClicked(int)));
@@ -85,7 +86,7 @@ QLabel *PhotoSet::GetPhoto(int photoID) const
 
 void PhotoSet::Score(int photoID, int score)
 {
-	emit photoScored(setID, photoID, score);
+	clientNetwork->ScorePhoto(dirname, QFileInfo(fileList.value(photoID)).fileName(), score);
 }
 
 

@@ -32,8 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
 	clientNetwork->LogOut();
+	clientNetwork->deleteLater();
 	delete centralWidget;
-	delete clientNetwork;
 }
 
 void MainWindow::InitMainScene()
@@ -61,11 +61,18 @@ void MainWindow::InitMainScene()
 void MainWindow::InitMainControl()
 {
 	clientNetwork = new clientnetwork::MyClient;
-	clientNetwork->moveToThread(new QThread(this));
-	connect(clientNetwork, SIGNAL(PhotosSaved(QList<QString>*)), this, SLOT(RefreshPhotos()));
+//	QThread *networkThread = new QThread(this);networkThread->start();
+//	clientNetwork->moveToThread(networkThread);
+	connect(this, SIGNAL(windowLoaded()), clientNetwork, SLOT(SetupConnection()));
+	connect(clientNetwork, SIGNAL(connected()), this, SLOT(EnableLogIn()));
+	connect(clientNetwork, SIGNAL(PhotosSaved(QStringList)), this, SLOT(RefreshPhotos()));
+
 	photoSetsController = new PhotoSetsController(clientNetwork, this);
-	connect(this, SIGNAL(RefreshRequired()), photoSetsController, SLOT(StartRefresh()));
+//	QThread *photoControllerThread = new QThread(this);photoControllerThread->start();
+//	photoSetsController->moveToThread(photoControllerThread);
+	connect(this, SIGNAL(refreshRequest()), photoSetsController, SLOT(StartRefresh()));
 	connect(photoSetsController, SIGNAL(RefreshComplete(QGroupBox*)), this, SLOT(RefreshComplete(QGroupBox*)));
+
 	photostream = new photostream::WechatStream(this);
 	streamdisplay = new photostream::StreamDisplay(clientNetwork, "wechat_photo_stream_temp/", this);
 	streamtimer = new QTimer;
@@ -74,6 +81,12 @@ void MainWindow::InitMainControl()
 
 	InitButtons();
 	InitShortCuts();
+
+	char hostip[100];
+	std::cin >> hostip;
+	if (strlen(hostip) > 4)
+		clientNetwork->SetIP(hostip);
+	emit windowLoaded();
 }
 
 void MainWindow::InitButtons()
@@ -84,6 +97,7 @@ void MainWindow::InitButtons()
 	loginPhotoButton = new QPushButton("Log in", this);
 	connect(loginPhotoButton, SIGNAL(clicked()), this, SLOT(LogIn()));
 	layout->addWidget(loginPhotoButton, 0, Qt::AlignTop);
+	loginPhotoButton->setDisabled(true);
 
 	addPhotoButton = new QPushButton("Add Photo", this);
 	connect(addPhotoButton, SIGNAL(clicked()), photoSetsController, SLOT(NewPhoto()));
@@ -110,7 +124,7 @@ void MainWindow::InitShortCuts()
 
 void MainWindow::RefreshPhotos()
 {
-	emit RefreshRequired();
+	emit refreshRequest();
 }
 
 void MainWindow::TurnOnPhotoStream()
@@ -138,6 +152,11 @@ void MainWindow::RefreshComplete(QGroupBox *newPhotoSetsBox)
 
 	photoArea->setWidget(photoSetsBox);
 	photoArea->verticalScrollBar()->setValue(photoArea->verticalScrollBar()->maximum());
+}
+
+void MainWindow::EnableLogIn()
+{
+	loginPhotoButton->setDisabled(false);
 }
 
 }

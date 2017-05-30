@@ -21,7 +21,7 @@ signals:
 	void score(int photoID, int record);
 
 public:
-	StarCheck(int photoID, QWidget *parent = nullptr);
+	StarCheck(int score, int photoID, QWidget *parent = nullptr);
 
 public slots:
 	void Stared(int id, int state);

@@ -9,8 +9,8 @@
 namespace uiutility
 {
 
-PhotoWindow::PhotoWindow(QString photoFileName, bool isStream, QWidget *parent)
-		: QMainWindow(parent, Qt::Window | Qt::FramelessWindowHint ), isStream(isStream)
+PhotoWindow::PhotoWindow(QString photoFileName, bool isStream, QSize size, QWidget *parent)
+		: QMainWindow(parent, Qt::Window | Qt::FramelessWindowHint ), photoFileName(photoFileName), isStream(isStream), originalSize(size)
 {
 	setAttribute(Qt::WA_NoSystemBackground, true);
 	setAttribute(Qt::WA_TranslucentBackground, true);
@@ -103,10 +103,17 @@ void PhotoWindow::SetPhoto(QString photoFileName)
 		}
 	}
 	QPixmap *photoPixmap = localfilemanager::OpenImage(photoFileName);
-	if (photoPixmap->width() > PHOTO_LABEL_SIZE.width() * 2 || photoPixmap->height() > PHOTO_LABEL_SIZE.height() * 2)
+	QSize size;
+	if (isStream)
+		size = photoPixmap->size();
+	else
+		size = originalSize;
+	if (size.width() > PHOTO_LABEL_SIZE.width() * 2 || size.height() > PHOTO_LABEL_SIZE.height() * 2)
 	{
-		*photoPixmap = photoPixmap->scaled(PHOTO_LABEL_SIZE * 2, Qt::KeepAspectRatio, Qt::FastTransformation);
+		size = size.scaled(PHOTO_LABEL_SIZE * 2, Qt::KeepAspectRatio);
 	}
+
+	*photoPixmap = photoPixmap->scaled(size, Qt::KeepAspectRatio, Qt::FastTransformation);
 	centralLabel->resize(photoPixmap->size());
 	centralLabel->setPixmap(*photoPixmap);
 	delete photoPixmap;
@@ -117,12 +124,13 @@ void PhotoWindow::SetPhoto(QString photoFileName)
 
 void PhotoWindow::SetAnimation()
 {
-	QPropertyAnimation *animation = new QPropertyAnimation(this, "windowOpacity", this);
+	QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);
+	centralLabel->setGraphicsEffect(eff);
+	QPropertyAnimation *animation = new QPropertyAnimation(eff, "opacity", this);
 	animation->setDuration(500);
 	animation->setStartValue(0);
 	animation->setEndValue(1);
-	animation->start();
-
+	animation->start(QPropertyAnimation::DeleteWhenStopped);
 	if (isStream)
 	{
 		int &&y = rand() % (SCREEN_UNIT * 200);
@@ -130,7 +138,7 @@ void PhotoWindow::SetAnimation()
 		streamAnimation->setDuration(5000);
 		streamAnimation->setStartValue(QPoint(SCREEN_UNIT * 480, y));
 		streamAnimation->setEndValue(QPoint(0, y));
-		streamAnimation->start();
+		streamAnimation->start(QPropertyAnimation::DeleteWhenStopped);
 		connect(streamAnimation, SIGNAL(finished()), this, SLOT(Vanish()));
 	}
 	else
@@ -145,8 +153,17 @@ void PhotoWindow::Vanish()
 	animation->setDuration(500);
 	animation->setStartValue(windowOpacity());
 	animation->setEndValue(0);
-	animation->start();
+	animation->start(QPropertyAnimation::DeleteWhenStopped);
 	connect(animation, SIGNAL(finished()), this, SLOT(close()));
+}
+
+void PhotoWindow::RefreshOriginalPhoto(QStringList filelist)
+{
+	qDebug() << "PhotoWindow::RefreshOriginalPhoto";
+	if (filelist.contains(photoFileName))
+	{
+		SetPhoto(photoFileName);
+	}
 }
 
 

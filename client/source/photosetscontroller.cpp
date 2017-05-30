@@ -40,12 +40,11 @@ QGroupBox *PhotoSetsController::CreatePhotoSetsBox()
 
 	for (int i = 0; i < photoSetFiles.size(); ++i)
 	{
-		photoSets[i] = new PhotoSet(i, photoSetFiles.value(i), QDir(dirs.value(i)).dirName());
+		photoSets[i] = new PhotoSet(clientNetwork, i, photoSetFiles.value(i), QDir(dirs.value(i)).dirName());
 		layout->addWidget(photoSets[i], 0, Qt::AlignTop);
 		connect(photoSets[i], SIGNAL(photoClicked(int, int)), this, SLOT(PhotoClicked(int, int)));
 		connect(photoSets[i], SIGNAL(photoRightClicked(int, int)), this, SLOT(PhotoRightClicked(int, int)));
 		connect(photoSets[i], SIGNAL(photoDoubleClicked(int, int)), this, SLOT(PhotoDoubleClicked(int, int)));
-		connect(photoSets[i], SIGNAL(photoScored(int, int, int)), this, SLOT(PhotoScored(int, int, int)));
 	}
 
 	photoSetsBox->setLayout(layout);
@@ -81,7 +80,17 @@ void PhotoSetsController::PhotoRightClicked(int setID, int photoID)
 
 void PhotoSetsController::PhotoDoubleClicked(int setID, int photoID)
 {
-	uiutility::PhotoWindow *photo = new uiutility::PhotoWindow(photoSetFiles[setID][photoID], 0, this);
+	qDebug() << "PhotoSetsController: Showing Photo Window";
+	QSize originalSize = clientNetwork->AskforOneSize(QDir(dirs.value(setID)).dirName(), QFileInfo(photoSetFiles.value(setID).value(photoID)).fileName());
+	uiutility::PhotoWindow *photo = new uiutility::PhotoWindow(photoSetFiles[setID][photoID], false, originalSize, this);
+
+	if (localfilemanager::OpenImage(photoSetFiles[setID][photoID])->size() != originalSize)
+	{
+		qDebug() << "PhotoSetsController: Original Photo Request";
+		clientNetwork->AskforBigPhoto(QDir(dirs.value(setID)).dirName(),
+		                              QFileInfo(photoSetFiles.value(setID).value(photoID)).fileName());
+		connect(clientNetwork, SIGNAL(PhotosSaved(QStringList)), photo, SLOT(RefreshOriginalPhoto(QStringList)));
+	}
 	photo->show();
 }
 
@@ -101,12 +110,6 @@ void PhotoSetsController::DeletePhotoFile()
 void PhotoSetsController::StartRefresh()
 {
 	emit RefreshComplete(CreatePhotoSetsBox());
-}
-
-void PhotoSetsController::PhotoScored(int setID, int photoID, int score)
-{
-//	qDebug() << QDir(dirs.value(setID)).dirName() << QFileInfo(photoSetFiles.value(setID).value(photoID)).fileName();
-	clientNetwork->ScorePhoto(QDir(dirs.value(setID)).dirName(), QFileInfo(photoSetFiles.value(setID).value(photoID)).fileName(), score);
 }
 
 }

@@ -48,9 +48,11 @@ private slots:
     void ReceiveMessage();
 
 signals:
+	void connected();
+
     void Received(User*);
 
-    void PhotosSaved(QList<QString>);
+    void PhotosSaved(QStringList);
 
     void LogSaved();
 
@@ -64,8 +66,6 @@ public:
     void SetPath(const QString &path);
 
     void SetIP(const QString &hostip);
-
-    void SetupConnection();
 
     void ScorePhoto(const QString &date, const QString &title, double points);
 
@@ -81,7 +81,11 @@ public:
 
     QSize AskforOneSize(const QString& date, const QString& title);
     
-    double AskforOnePoints(const QString& date, const QString& title);
+    int AskforOnePoints(const QString& date, const QString& title);
+
+public slots:
+    void SetupConnection();
+
 };
 }
 #endif // FACEMASH2_MYCLIENT_H
