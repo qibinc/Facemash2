@@ -15,7 +15,6 @@ WechatStream::WechatStream(QObject *parent) : QThread(parent)
 void WechatStream::run()
 {
 	pycode = fopen("main.py", "r");
-	qDebug() << pycode;
 
 	Py_Initialize();
 	PyRun_SimpleFile(pycode, "main.py");

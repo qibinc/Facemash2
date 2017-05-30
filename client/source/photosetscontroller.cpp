@@ -80,10 +80,11 @@ void PhotoSetsController::PhotoRightClicked(int setID, int photoID)
 
 void PhotoSetsController::PhotoDoubleClicked(int setID, int photoID)
 {
-	qDebug() << "PhotoSetsController: Showing Photo Window";
+	qDebug() << "PhotoSetsController: Showing Photo Window" << QDir(dirs.value(setID)).dirName() << QFileInfo(photoSetFiles.value(setID).value(photoID)).fileName();
 	QSize originalSize = clientNetwork->AskforOneSize(QDir(dirs.value(setID)).dirName(), QFileInfo(photoSetFiles.value(setID).value(photoID)).fileName());
 	uiutility::PhotoWindow *photo = new uiutility::PhotoWindow(photoSetFiles[setID][photoID], false, originalSize, this);
 
+	qDebug() << localfilemanager::OpenImage(photoSetFiles[setID][photoID])->size() << originalSize;
 	if (localfilemanager::OpenImage(photoSetFiles[setID][photoID])->size() != originalSize)
 	{
 		qDebug() << "PhotoSetsController: Original Photo Request";

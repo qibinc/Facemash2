@@ -115,9 +115,8 @@ void MyClient::SavePhotos(User * user)
     //QJsonObject object;
     for (int i = 0; i < user->_groupnum; i++)
     {
-        QJsonObject inobj;
+        QJsonObject inobj = object.value(user->_groups.at(i)._date).toObject();
         QString Prefix = KeepPath + user->_groups.at(i)._date;
-        qDebug() << Prefix;
 
         QDir *dir = new QDir;//若没有路径则新建目录！
         if (!dir->exists(Prefix))
@@ -152,10 +151,9 @@ void MyClient::SavePhotos(User * user)
     //file->write(jsonArray);
     //file->close();
     doc.setObject(object);
-    JsonArray.resize(0);
-    JsonArray = doc.toJson();
-    file->seek(0);
-    file->write(JsonArray);
+	QByteArray newJson = doc.toJson();
+	file->resize(0);
+    file->write(newJson);
     file->close();
 
 	qDebug() << "ClientNetwork::SavePhotos" << filepaths;
@@ -190,11 +188,6 @@ void MyClient::UpdatePoints(User * user)
     QByteArray pointsArray = pointsfile->readAll();
     QJsonDocument doc = QJsonDocument::fromJson(pointsArray);
 
-    if (doc.isObject())
-    {
-        qDebug() << "isObject!";
-    }
-
     QJsonObject obj = doc.object();
 
     for (int i = 0; i < user->_groupnum; i++)
@@ -214,7 +207,7 @@ void MyClient::UpdatePoints(User * user)
     doc.setObject(obj);
     pointsArray.resize(0);
     pointsArray = doc.toJson();
-    pointsfile->seek(0);
+    pointsfile->resize(0);
     pointsfile->write(pointsArray);
     pointsfile->close();
 
@@ -224,7 +217,7 @@ void MyClient::UpdatePoints(User * user)
 
 void MyClient::LogIn(const QString &username)
 {
-	qDebug() << "ClientNetwork::LogIn:\t" + username;
+	qDebug() << "ClientNetwork::LogIn:\t" << username;
     QFile *file = new QFile(KeepPath + "config.json");
     if(!file->open(QFile::ReadWrite))
     {
@@ -233,7 +226,7 @@ void MyClient::LogIn(const QString &username)
     }
 
     QByteArray JsonArray = file->readAll();
-    QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
+	QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
     QJsonObject object = doc.object();
 
     User user;
@@ -284,7 +277,7 @@ void MyClient::LogIn(const QString &username)
 
 void MyClient::LogOut()
 {
-	qDebug() << "ClientNetwork::LogOut:\t" + UserName;
+	qDebug() << "ClientNetwork::LogOut:\t" << UserName;
 	User user;
     user._clienttype = LOGOUT;
     user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
@@ -303,7 +296,6 @@ void MyClient::LogOut()
 	if (!_readwritesocket->waitForBytesWritten())
 		qDebug() << "\tTime out";
 	_readwritesocket->disconnectFromHost();
-	_readwritesocket->waitForDisconnected();
 //    if (_readwritesocket->state() == QAbstractSocket::UnconnectedState ||
 //        _readwritesocket->waitForDisconnected(2000))
 //        qDebug() << "Disconnected";
@@ -378,7 +370,6 @@ void MyClient::UploadSinglePhoto(const QString &photopath)
     QDir *dir = new QDir;
     if (!dir->exists(KeepPath + date))
     {
-        qDebug() << "mkdir" + KeepPath + date;
         dir->mkdir(KeepPath + date);
     }
     delete dir;
@@ -424,7 +415,7 @@ void MyClient::UploadSinglePhoto(const QString &photopath)
     doc.setObject(object);
     array.resize(0);
     array = doc.toJson();
-    file->seek(0);
+    file->resize(0);
     file->write(array);
     file->close();
 
@@ -433,7 +424,7 @@ void MyClient::UploadSinglePhoto(const QString &photopath)
 
 void MyClient::ScorePhoto(const QString &date, const QString &title, double points)
 {
-	qDebug() << "ClientNetwork::ScorePhoto:\tphoto: " + date + "/" + title + "score: " + points;
+	qDebug() << "ClientNetwork::ScorePhoto:\tphoto: " << date + "/" + title << "  score: " << points;
 
 	User user;
     user._clienttype = EVAL;
@@ -487,7 +478,7 @@ void MyClient::ScorePhoto(const QString &date, const QString &title, double poin
 
 void MyClient::AskforBigPhoto(const QString &date, const QString &title)
 {
-	qDebug() << "ClientNetwork::OriginalPhotoRequested:\tphoto: " + date + "/" + title;
+	qDebug() << "ClientNetwork::OriginalPhotoRequested:\tphoto: " << date + "/" + title;
 
 	User user;
     user._clienttype = FORBIG;
@@ -516,7 +507,7 @@ void MyClient::AskforBigPhoto(const QString &date, const QString &title)
 
 QSize MyClient::AskforOneSize(const QString &date, const QString &title)
 {
-	qDebug() << "ClientNetwork::OriginalSizeRequested:\tphoto: " + date + "/" + title;
+	qDebug() << "ClientNetwork::OriginalSizeRequested:\tphoto: " << date + "/" + title;
 
 	QFile *file = new QFile(KeepPath + "config.json");
     if(!file->open(QFile::ReadOnly))
@@ -526,9 +517,9 @@ QSize MyClient::AskforOneSize(const QString &date, const QString &title)
     }
     QByteArray JsonArray;
     JsonArray = file->readAll();
-    QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
+	QJsonDocument doc = QJsonDocument::fromJson(JsonArray);
     QJsonObject object = doc.object();
-    file->close();
+	file->close();
 
     QSize size;
     QJsonObject dateobj = object[date].toObject();
@@ -558,7 +549,7 @@ int MyClient::AskforOnePoints(const QString &date, const QString &title)
     //size.setHeight(photoobj["height"]);
     //size.setWidth(photoobj["width"]);
     return photoobj["points"].toDouble();*/
-
+	qDebug() << "ClientNetwork::AskforSingleScore\t" << date + "/" + title << _map.value(date + title);
     return (int) _map.value(date + title);
 }
 
