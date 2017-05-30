@@ -24,7 +24,7 @@ void MyServer::GetConnection()
     //_readwritesockets.append(_socket);
     //_socketdescriptors.append(_socket->socketDescriptor());
     QObject::connect(_socket, SIGNAL(readyRead()), this, SLOT(KeepMessage()));
-    QObject::connect(_socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+    QObject::connect(_socket, SIGNAL(disconnected()), _socket, SLOT(deleteLater()));
 }
 
 void MyServer::KeepMessage()
@@ -90,6 +90,7 @@ void MyServer::KeepMessage()
                 socket->disconnectFromHost();
                 socket->waitForDisconnected();
                 _map.remove(user->_username);
+
                 emit GetMessageFromClient(user);
             }
             else{

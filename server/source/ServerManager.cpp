@@ -20,6 +20,7 @@ UserStatus server::ServerManager::login (server::Date date , QString UserID , QL
     userManager->addUser(date, UserID, password);
     if(userManager->login(date, UserID, password)){
         //todo encapsulate following
+        qDebug()<<"server::ServerManager::login ,groupnames:"<<groupnames<<"filenames"<<filenames;
         const QList<SimpleGroup>* groups = photoManager->getImages(groupnames, filenames, Thumbnail);
         qint32 groupnum = groups->length();
         QList<qint32> photonums;
@@ -36,8 +37,8 @@ UserStatus server::ServerManager::login (server::Date date , QString UserID , QL
             imagenames.append(groups->at(i).getNames());
             scores.append(groups->at(i).getScores());
         }
-        qDebug()<<"server::ServerManager::login, user is:" + UserID;
-        qDebug()<<"server::ServerManager::login, return groups num is:" + groupnum;
+        qDebug()<<"server::ServerManager::login, user is:" << UserID;
+        qDebug()<<"server::ServerManager::login, return groups num is:" << groupnum;
 
         myServer->PassAllPhotos(UserID, groupnum, photonums, groupnames, images, sizes, imagenames, scores);
         delete groups;
@@ -139,6 +140,7 @@ bool server::ServerManager::unJudgePhoto (server::Date date , QString userID , Q
 //}
 
 const QImage *server::ServerManager::responseWithFullImage (QString username , QString groupname , QString filename) {
+    qDebug()<<"in responsewith full image";
     const QImage* image = photoManager->getImage(groupname , filename , server::FullImage);
     QList<qint32> photonums;    photonums.append(1);
     QList<QString> groupnames, photonames;
@@ -148,7 +150,6 @@ const QImage *server::ServerManager::responseWithFullImage (QString username , Q
     groupnames.append(groupname);
     photonames.append(filename);
     myServer->PassAllPhotos(username, 1, photonums, groupnames, images, sizes, photonames, scores);
-    delete image;
     return NULL;
 }
 

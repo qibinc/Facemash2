@@ -66,15 +66,15 @@ class SimplePhoto{
 private:
     QString _filename;
     QImage _image;
+    QSize _size;
     double _score;
 public:
-    double getScore () const {
-        return _score;
-    }
+    double getScore () const { return _score; }
     const QString &getFilename () const { return _filename; }
     const QImage &getImage () const { return _image; }
-    SimplePhoto(QString filename, const QImage *image, double score):
-            _filename(filename), _image(*image), _score(score){}
+    const QSize &getSize() const { return  _size; }
+    SimplePhoto(QString filename, const QImage *image, QSize size, double score):
+            _filename(filename), _image(*image), _size(size), _score(score){}
 };
 
 class SimpleGroup{

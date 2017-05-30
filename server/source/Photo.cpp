@@ -102,7 +102,7 @@ const QList<QImage> SimpleGroup::getImages () const {
 const QList<QSize> SimpleGroup::getSizes () const {
     QList<QSize> sizes;
     for (QList<SimplePhoto>::const_iterator iter = _album.begin(); iter != _album.end(); ++iter) {
-        sizes.append(iter->getImage().size());
+        sizes.append(iter->getSize());
     }
     return sizes;
 }
