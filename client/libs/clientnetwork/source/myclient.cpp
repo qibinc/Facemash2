@@ -10,11 +10,6 @@ MyClient::MyClient(QObject *parent) :
         HostIP(QHostAddress(QHostAddress::LocalHost).toString()),
         KeepPath("./")
 {
-    _readwritesocket = new QTcpSocket(this);
-    //_readwritesocket->connectToHost("101.5.218.89", 8888);
-    // _readwritesocket->waitForConnected(2000);
-    //QObject::connect(_readwritesocket, SIGNAL(readyRead()), this, SLOT(ReceiveMessage()));
-    //QObject::connect(this, SIGNAL(Received(User*)), this, SLOT(DealWithMessage(User*)));
 }
 
 MyClient::~MyClient()
@@ -24,6 +19,7 @@ MyClient::~MyClient()
 
 void MyClient::SetIP(const QString &hostip)
 {
+	qDebug() << "ClientNetwork::SetIP\t" << hostip;
     HostIP = hostip;
 }
 
@@ -35,30 +31,36 @@ void MyClient::SetPath(const QString &path)
 
 void MyClient::SetupConnection()
 {
+	_readwritesocket = new QTcpSocket(this);
 	_readwritesocket->connectToHost(HostIP, 8888);
-    _readwritesocket->waitForConnected(2000);
+	_readwritesocket->waitForConnected(20000);
 	if (_readwritesocket->ConnectedState != QTcpSocket::ConnectedState)
 	{
-		qDebug() << "Failed to connect to server";
+		qDebug() << "ClientNetwork::SetupConnection\tFailed to connect to server";
 		return ;
 	}
-    QObject::connect(_readwritesocket, SIGNAL(readyRead()), this, SLOT(ReceiveMessage()));
+	qDebug() << "ClientNetwork::SetupConnection\t" << _readwritesocket->peerAddress();
+
+	QObject::connect(_readwritesocket, SIGNAL(readyRead()), this, SLOT(ReceiveMessage()));
     QObject::connect(this, SIGNAL(Received(User * )), this, SLOT(DealWithMessage(User * )));
+	emit connected();
 }
 
 void MyClient::DealWithMessage(User * user)
 {
-    qDebug() << "DealWithHere!";
     switch (user->_servertype)
     {
         case PHOTOS:
-            SavePhotos(user);
+	        qDebug() << "ClientNetwork::DealingWithMessage\tPhotos";
+		    SavePhotos(user);
             break;
         case LOG:
+	        qDebug() << "ClientNetwork::DealingWithMessage\tLogs";
             SaveLog(user);
             break;
         case POINTS:
-            UpdatePoints(user);
+	        qDebug() << "ClientNetwork::DealingWithMessage\tScores";
+		    UpdatePoints(user);
             break;
         default:
             break;
@@ -67,8 +69,7 @@ void MyClient::DealWithMessage(User * user)
 
 void MyClient::ReceiveMessage()
 {
-    qDebug() << "Receiving!";
-    qDebug() << _readwritesocket->bytesAvailable();
+    qDebug() << "ClientNetwork::ReceiveMessage\t" << _readwritesocket->bytesAvailable();
     if (totalBytes == 0 && _readwritesocket->bytesAvailable() >= sizeof(qint64))
     {
         QDataStream in(_readwritesocket);
@@ -98,7 +99,6 @@ void MyClient::ReceiveMessage()
 
 void MyClient::SavePhotos(User * user)
 {
-    qDebug() << "clientnetwork::SavePhotos";
     QFile *file = new QFile(KeepPath + "config.json");
     if (!file->open(QFile::ReadWrite))
     {
@@ -158,12 +158,14 @@ void MyClient::SavePhotos(User * user)
     file->write(JsonArray);
     file->close();
 
+	qDebug() << "ClientNetwork::SavePhotos" << filepaths;
+
     emit PhotosSaved(filepaths);
 }
 
 void MyClient::SaveLog(User * user)
 {
-    qDebug() << "SaveLogHere!";
+    qDebug() << "ClientNetwork::SaveLog";
     QFile *logfile = new QFile(KeepPath + "Log.txt");
     if (!logfile->open(QFile::WriteOnly))
     {
@@ -178,7 +180,7 @@ void MyClient::SaveLog(User * user)
 
 void MyClient::UpdatePoints(User * user)
 {
-    qDebug() << "UpdatePointsHere!";
+    qDebug() << "ClientNetwork::PointsUpdated";
     QFile *pointsfile = new QFile(KeepPath + "config.json");
     if (!pointsfile->open(QFile::ReadWrite))
     {
@@ -220,11 +222,9 @@ void MyClient::UpdatePoints(User * user)
 }
 
 
-
-//Client Operations!
-
 void MyClient::LogIn(const QString &username)
 {
+	qDebug() << "ClientNetwork::LogIn:\t" + username;
     QFile *file = new QFile(KeepPath + "config.json");
     if(!file->open(QFile::ReadWrite))
     {
@@ -274,15 +274,18 @@ void MyClient::LogIn(const QString &username)
     out<<user;
     out.device()->seek(0);
     out<<(qint64)(BtArray.size() - sizeof(qint64));
-    qDebug()<<BtArray.size();
+//    qDebug()<<BtArray.size();
     qint64 temp = _readwritesocket->write(BtArray);
-    qDebug()<<temp;
+	if (!_readwritesocket->waitForBytesWritten())
+		qDebug() << "\tTime out";
+//    qDebug()<<temp;
 }
 
 
 void MyClient::LogOut()
 {
-    User user;
+	qDebug() << "ClientNetwork::LogOut:\t" + UserName;
+	User user;
     user._clienttype = LOGOUT;
     user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
     user._username = UserName;
@@ -297,21 +300,22 @@ void MyClient::LogOut()
     out << (qint64) (outArray.size() - sizeof(qint64));
 
     qint64 temp = _readwritesocket->write(outArray);
-
-
-    _readwritesocket->waitForBytesWritten();
-    _readwritesocket->disconnectFromHost();
-    if (_readwritesocket->state() == QAbstractSocket::UnconnectedState ||
-        _readwritesocket->waitForDisconnected(2000))
-        qDebug() << "Disconnected";
-
+	if (!_readwritesocket->waitForBytesWritten())
+		qDebug() << "\tTime out";
+	_readwritesocket->disconnectFromHost();
+	_readwritesocket->waitForDisconnected();
+//    if (_readwritesocket->state() == QAbstractSocket::UnconnectedState ||
+//        _readwritesocket->waitForDisconnected(2000))
+//        qDebug() << "Disconnected";
 
 }
 
 
 void MyClient::AskforLog()
 {
-    //QFile *file = new QFile(KeepPath + "config.json");
+	qDebug() << "ClientNetwork::AskforLog";
+
+	//QFile *file = new QFile(KeepPath + "config.json");
     //if(!file->open(QFile::ReadOnly))
     //{
     //qDebug()<<"Open Config File Error in AskforLog!";
@@ -333,7 +337,8 @@ void MyClient::AskforLog()
     out << (qint64) (BtArray.size() - sizeof(qint64));
 
     qint64 temp = _readwritesocket->write(BtArray);
-
+	if (!_readwritesocket->waitForBytesWritten())
+		qDebug() << "\tTime out";
 
     //file->close();
 }
@@ -341,10 +346,10 @@ void MyClient::AskforLog()
 
 void MyClient::UploadSinglePhoto(const QString &photopath)
 {
-	qDebug() << "clientnetwork::UploadSinglePhoto " << photopath;
+	qDebug() << "ClientNetwork::UploadSinglePhoto:\t" << photopath;
     QString date = QDate::currentDate().toString(Qt::ISODate);
     QString title = QFileInfo(photopath).fileName();
-    QImage image(photopath);
+    QImage image(localfilemanager::OpenImage(photopath)->toImage());
 
     QList<QString> filepaths;
 
@@ -368,7 +373,8 @@ void MyClient::UploadSinglePhoto(const QString &photopath)
     out.device()->seek(0);
     out << (qint64) (outArray.size() - sizeof(qint64));
     qint64 temp = _readwritesocket->write(outArray);
-
+	if (!_readwritesocket->waitForBytesWritten())
+		qDebug() << "\tTime out";
     QDir *dir = new QDir;
     if (!dir->exists(KeepPath + date))
     {
@@ -427,7 +433,7 @@ void MyClient::UploadSinglePhoto(const QString &photopath)
 
 void MyClient::ScorePhoto(const QString &date, const QString &title, double points)
 {
-	qDebug() << "clientnetwork::ScorePhoto " << date << "/" << title << " " << points;
+	qDebug() << "ClientNetwork::ScorePhoto:\tphoto: " + date + "/" + title + "score: " + points;
 
 	User user;
     user._clienttype = EVAL;
@@ -448,9 +454,10 @@ void MyClient::ScorePhoto(const QString &date, const QString &title, double poin
     out << user;
     out.device()->seek(0);
     out << (qint64) (array.size() - sizeof(qint64));
-    qDebug() << array.size();
+//    qDebug() << array.size();
     qint64 temp = _readwritesocket->write(array);
-    qDebug() << temp;
+	if (!_readwritesocket->waitForBytesWritten())
+		qDebug() << "\tTime out";//    qDebug() << temp;
 
     /*QFile *file = new QFile(KeepPath + "config.json");
     if(!file->open(QFile::ReadWrite))
@@ -480,7 +487,9 @@ void MyClient::ScorePhoto(const QString &date, const QString &title, double poin
 
 void MyClient::AskforBigPhoto(const QString &date, const QString &title)
 {
-    User user;
+	qDebug() << "ClientNetwork::OriginalPhotoRequested:\tphoto: " + date + "/" + title;
+
+	User user;
     user._clienttype = FORBIG;
     user._username = UserName;
     user._datetime = QDateTime::currentDateTime();//.toString(Qt::ISODate);
@@ -501,11 +510,15 @@ void MyClient::AskforBigPhoto(const QString &date, const QString &title)
     out<<(qint64)(outArray.size() - sizeof(qint64));
 
     qint64 temp = _readwritesocket->write(outArray);
+	if (!_readwritesocket->waitForBytesWritten())
+		qDebug() << "\tTime out";
 }
 
 QSize MyClient::AskforOneSize(const QString &date, const QString &title)
 {
-    QFile *file = new QFile(KeepPath + "config.json");
+	qDebug() << "ClientNetwork::OriginalSizeRequested:\tphoto: " + date + "/" + title;
+
+	QFile *file = new QFile(KeepPath + "config.json");
     if(!file->open(QFile::ReadOnly))
     {
         qDebug()<<"Open Config Error in AskforOneSize!";
@@ -525,7 +538,7 @@ QSize MyClient::AskforOneSize(const QString &date, const QString &title)
     return size;
 }
 
-double MyClient::AskforOnePoints(const QString &date, const QString &title)
+int MyClient::AskforOnePoints(const QString &date, const QString &title)
 {
     /*QFile *file = new QFile(KeepPath + "config.json");
     if(!file->open(QFile::ReadOnly))
@@ -546,7 +559,7 @@ double MyClient::AskforOnePoints(const QString &date, const QString &title)
     //size.setWidth(photoobj["width"]);
     return photoobj["points"].toDouble();*/
 
-    return _map.value(date + title);
+    return (int) _map.value(date + title);
 }
 
 }

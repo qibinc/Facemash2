@@ -9,11 +9,11 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
 	clientnetwork::MyClient *clientNetwork = new clientnetwork::MyClient;
-	clientNetwork->SetupConnection();
 //	clientNetwork->SetIP("");
-	clientNetwork->LogIn("123");
-	clientNetwork->UploadSinglePhoto("tmp.jpg");
-	clientNetwork->ScorePhoto("2017-05-29", "tmp.jpg", 5);
+	clientNetwork->LogIn("clientnetwork_test");
+	clientNetwork->UploadSinglePhoto("star.png");
+	clientNetwork->ScorePhoto("2017-05-29", "star.png", 5);
 
+	a.exec();
 	return 0;
 }

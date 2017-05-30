@@ -45,7 +45,6 @@ public slots:
 	void PhotoClicked(int setID, int photoID);
 	void PhotoRightClicked(int setID, int photoID);
 	void PhotoDoubleClicked(int setID, int photoID);
-	void PhotoScored(int setID, int photoID, int score);
 };
 
 }

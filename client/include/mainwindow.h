@@ -45,7 +45,8 @@ private:
 	void InitButtons();
 
 signals:
-	void RefreshRequired();
+	void windowLoaded();
+	void refreshRequest();
 
 private slots:
 	void TurnOnPhotoStream();
@@ -57,6 +58,7 @@ public slots:
 
 	void RefreshComplete(QGroupBox *newPhotoSetsBox);
 
+	void EnableLogIn();
 public:
 	explicit MainWindow(QWidget *parent = nullptr);
 

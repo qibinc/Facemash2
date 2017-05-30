@@ -7,13 +7,13 @@ if (NOT TARGET photostream)
     set(SOURCE_FILES source/wechatstream.cpp include/wechatstream.h test/photostream_test.cpp)
 
     include_directories(include)
-
     add_library(photostream STATIC ${SOURCE_FILES})
 
 
     find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
     qt5_use_modules(photostream Core Widgets Gui)
 
+    include_directories(${PYTHON_INCLUDE_DIR})
     target_link_libraries(photostream ${PYTHON_LIBRARIES})
 
     add_subdirectory(libs/uiutility)

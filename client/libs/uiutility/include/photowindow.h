@@ -15,6 +15,7 @@ Q_OBJECT
 
 private:
 	bool isStream;
+	QString photoFileName;
 	QSize originalSize;
 	QLabel *centralLabel;
 	QPoint mouseStartLocation, windowStartLocation;
@@ -40,9 +41,12 @@ protected:
 	void keyPressEvent(QKeyEvent *event) override;
 
 public:
-	PhotoWindow(QString photoFileName, bool isStream = false, QWidget *parent = nullptr);
+	PhotoWindow(QString photoFileName, bool isStream = false, QSize size = QSize(0, 0), QWidget *parent = nullptr);
 
 	virtual ~PhotoWindow();
+
+public slots:
+	void RefreshOriginalPhoto(QStringList);
 
 };
 }
