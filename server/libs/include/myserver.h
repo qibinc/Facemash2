@@ -28,7 +28,7 @@ private:
     QByteArray inArray;
 
 signals:
-    void GetMessageFromClient(User*);
+    void GetMessageFromClient(dyh::User*);
 
 
 private slots:

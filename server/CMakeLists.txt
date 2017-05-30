@@ -17,7 +17,7 @@ add_executable(Server ${SOURCE_FILES})
 
 find_package(Qt5 COMPONENTS Core Widgets Gui Sql REQUIRED)
 
-qt5_use_modules(Server Core Widgets Gui Sql)
+qt5_use_modules(Server Core Widgets Gui Sql Network)
 
 #add_subdirectory(uiutility)
 #include_directories(uiutility/include)

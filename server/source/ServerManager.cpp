@@ -18,7 +18,7 @@ UserStatus server::ServerManager::signUp (server::Date date , QString userID , Q
 UserStatus server::ServerManager::login (server::Date date , QString UserID , QList<QString> groupnames , QList<QString> filenames , QString password) {//todo specify the filenames
     userManager->addUser(date, UserID, password);
     if(userManager->login(date, UserID, password)){
-        //todo get pass func and encapsulate following
+        //todo encapsulate following
         const QList<SimpleGroup>* groups = photoManager->getImages(groupnames, filenames, Thumbnail);
         qint32 groupnum = groups->length();
         QList<qint32> photonums;
@@ -35,9 +35,21 @@ UserStatus server::ServerManager::login (server::Date date , QString UserID , QL
             imagenames.append(groups->at(i).getNames());
             scores.append(groups->at(i).getScores());
         }
+        qDebug()<<UserID;
+        qDebug()<<groupnum;
+        qDebug()<<photonums;
+        qDebug()<<groupnames;
+        qDebug()<<images;
+        qDebug()<<sizes;
+        qDebug()<<imagenames;
+        qDebug()<<scores;
+
         myServer->PassAllPhotos(UserID, groupnum, photonums, groupnames, images, sizes, imagenames, scores);
         delete groups;
         return succeed;
+    }
+    else {
+        qDebug()<<"is online";
     }
     return wrongPW;
 }
@@ -57,8 +69,7 @@ QList<QString> server::ServerManager::queryLog (QString userID) {
     return logList;//todo remove return value
 }
 
-bool server::ServerManager::uploadPhoto (server::Date date , QString userID , QString groupname , QString filename ,
-                                         QImage *image) {
+bool server::ServerManager::uploadPhoto (server::Date date , QString userID , QString groupname , QString filename , QImage *image) {
     if(userManager->upload(date, userID, filename)){
         photoManager->addPhoto(groupname , filename , image);
         if(image->save(filename, 0)){
@@ -67,16 +78,16 @@ bool server::ServerManager::uploadPhoto (server::Date date , QString userID , QS
         else {
             qDebug()<<"save " + groupname + "-" + filename + " failed";
         }
-        //todo get pass func
         QList<QString> users = userManager->searchOnlineUsers();
         QList<qint32> photonums;    photonums.append(1);
         QList<QString> groupnames, photonames;
         QList<QSize> sizes;  sizes.append(image->size());
         QList<double> scores;   scores.append(0);
+        QList<QImage> images;   images.append(*image);
         groupnames.append(groupname);
         photonames.append(filename);
-        for(QList<QString>::iterator iter = users.begin(); iter != users.end(); ++iter){
-            myServer->PassAllPhotos((*iter), 1, photonums, groupnames, image, sizes, photonames, scores);
+        for(QList<QString>::iterator iter = users.begin(); iter != users.end() && (*iter) != userID ; ++iter){
+            myServer->PassAllPhotos((*iter), 1, photonums, groupnames, images, sizes, photonames, scores);
         }
         return true;
     }
@@ -126,15 +137,15 @@ bool server::ServerManager::unJudgePhoto (server::Date date , QString userID , Q
 //}
 
 const QImage *server::ServerManager::responseWithFullImage (QString username , QString groupname , QString filename) {
-    //todo get func
     const QImage* image = photoManager->getImage(groupname , filename , server::FullImage);
     QList<qint32> photonums;    photonums.append(1);
     QList<QString> groupnames, photonames;
     QList<QSize> sizes; sizes.append(image->size());
     QList<double> scores;   scores.append(photoManager->getScore(groupname, filename));
+    QList<QImage> images;   images.append(*image);
     groupnames.append(groupname);
     photonames.append(filename);
-    myServer->PassAllPhotos(username, 1, photonums, groupnames, *image, sizes, photonames, scores);
+    myServer->PassAllPhotos(username, 1, photonums, groupnames, images, sizes, photonames, scores);
     delete image;
     return NULL;
 }
@@ -157,14 +168,28 @@ void server::ServerManager::initWithSettings () {
 }
 
 void server::ServerManager::parseData (dyh::User *userData) {
+    qDebug()<<"server::received signal";
     QDate date = userData->_datetime.date();
     QTime time = userData->_datetime.time();
     Date tempDate(date.year(), date.month(), date.day(), time.hour(), time.minute(), time.second());
-//    QString
+
+    QString groupname = userData->_groups.at(0)._date;
+    QString filename = userData->_groups.at(0)._photos.at(0)._title;
+    QImage image = userData->_groups.at(0)._photos.at(0)._photo;
+    int score = userData->_groups.at(0)._photos.at(0)._points;
+
+    QList<QString> gnames, fnames;
+    for(QList<dyh::Group>::iterator i = userData->_groups.begin(); i != userData->_groups.end(); ++i){
+        gnames.append(i->_date);
+        for(QList<dyh::Photo>::iterator j = i->_photos.begin(); j != i->_photos.end(); ++j){
+            fnames.append(j->_title);
+        }
+    }
+
     switch (userData->_clienttype)
     {
         case dyh::LOGIN:
-            this->login(tempDate, userData->_username, userData.);
+            this->login(tempDate, userData->_username, gnames, fnames);
             break;
         case dyh::LOGOUT:
             this->logout(tempDate, userData->_username);
@@ -172,8 +197,8 @@ void server::ServerManager::parseData (dyh::User *userData) {
         case dyh::FORBIG:
             this->responseWithFullImage(userData->_username, groupname, filename);
             break;
-        case dyh::ADD;
-            this->uploadPhoto(tempDate, userData->_username, groupname, filename, image);
+        case dyh::ADD:
+            this->uploadPhoto(tempDate, userData->_username, groupname, filename, &image);
             break;
         case dyh::EVAL:
             this->judgePhoto(tempDate, userData->_username, groupname, filename, score);
