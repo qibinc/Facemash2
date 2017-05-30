@@ -5,6 +5,7 @@
 #include <QtNetwork/QTcpSocket>
 #include "data.h"
 #include <QFile>
+
 namespace dyh
 {
 class MyServer : public QObject
@@ -24,11 +25,10 @@ private:
 
     qint64 totalBytes;
     qint64 BytesReceived;
-
     QByteArray inArray;
 
 signals:
-    void GetMessageFromClient(User*);
+    void GetMessageFromClient(dyh::User*);
 
 
 private slots:

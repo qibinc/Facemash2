@@ -61,7 +61,7 @@ public:
                            int score);
 
 //    const QList<QImage> *initClientWithThumbnails (QList<QString> groupnames , QList<QString> filenames);
-        const QImage *responseWithFullImage (QString username , QString groupname , QString filename);
+    const QImage *responseWithFullImage (QString username , QString groupname , QString filename);
 
 public slots:
     void parseData(dyh::User *userData);

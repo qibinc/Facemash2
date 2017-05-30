@@ -4,6 +4,7 @@
 
 #include "ServerManager.h"
 #include "Photo.h"
+#include <QDir>
 
 namespace server {
 
@@ -18,7 +19,7 @@ UserStatus server::ServerManager::signUp (server::Date date , QString userID , Q
 UserStatus server::ServerManager::login (server::Date date , QString UserID , QList<QString> groupnames , QList<QString> filenames , QString password) {//todo specify the filenames
     userManager->addUser(date, UserID, password);
     if(userManager->login(date, UserID, password)){
-        //todo get pass func and encapsulate following
+        //todo encapsulate following
         const QList<SimpleGroup>* groups = photoManager->getImages(groupnames, filenames, Thumbnail);
         qint32 groupnum = groups->length();
         QList<qint32> photonums;
@@ -35,9 +36,15 @@ UserStatus server::ServerManager::login (server::Date date , QString UserID , QL
             imagenames.append(groups->at(i).getNames());
             scores.append(groups->at(i).getScores());
         }
+        qDebug()<<"server::ServerManager::login, user is:" + UserID;
+        qDebug()<<"server::ServerManager::login, return groups num is:" + groupnum;
+
         myServer->PassAllPhotos(UserID, groupnum, photonums, groupnames, images, sizes, imagenames, scores);
         delete groups;
         return succeed;
+    }
+    else {
+        qDebug()<<"server::ServerManager::login, "<<UserID<< "is online";
     }
     return wrongPW;
 }
@@ -57,26 +64,28 @@ QList<QString> server::ServerManager::queryLog (QString userID) {
     return logList;//todo remove return value
 }
 
-bool server::ServerManager::uploadPhoto (server::Date date , QString userID , QString groupname , QString filename ,
-                                         QImage *image) {
+bool server::ServerManager::uploadPhoto (server::Date date , QString userID , QString groupname , QString filename , QImage *image) {
     if(userManager->upload(date, userID, filename)){
         photoManager->addPhoto(groupname , filename , image);
-        if(image->save(filename, 0)){
+        if(!QDir("server" + groupname+"/").exists()){
+            QDir().mkdir("server" + groupname + "/");
+        }
+        if(image->save("server" + groupname + '/' + filename, 0)){
             qDebug()<<"save " + groupname + "-" + filename + " successful";
         }
         else {
             qDebug()<<"save " + groupname + "-" + filename + " failed";
         }
-        //todo get pass func
         QList<QString> users = userManager->searchOnlineUsers();
         QList<qint32> photonums;    photonums.append(1);
         QList<QString> groupnames, photonames;
         QList<QSize> sizes;  sizes.append(image->size());
         QList<double> scores;   scores.append(0);
+        QList<QImage> images;   images.append(*image);
         groupnames.append(groupname);
         photonames.append(filename);
-        for(QList<QString>::iterator iter = users.begin(); iter != users.end(); ++iter){
-            myServer->PassAllPhotos((*iter), 1, photonums, groupnames, image, sizes, photonames, scores);
+        for(QList<QString>::iterator iter = users.begin(); iter != users.end() && (*iter) != userID ; ++iter){
+            myServer->PassAllPhotos((*iter), 1, photonums, groupnames, images, sizes, photonames, scores);
         }
         return true;
     }
@@ -90,13 +99,17 @@ bool server::ServerManager::uploadPhoto (server::Date date , QString userID , QS
 bool server::ServerManager::judgePhoto (server::Date date , QString userID , QString groupname , QString filename , int score) {
     photoManager->addScoreToPhoto(groupname , filename , score , true);
     userManager->judgePhoto(date, userID, filename);
-    //todo get the func
     QList<QString> users = userManager->searchOnlineUsers();
     QList<qint32> photonums;    photonums.append(1);
     QList<QString> groupnames, photonames;
     groupnames.append(groupname);   photonames.append(filename);
     QList<double> scores;
-    scores.append(photoManager->getScore(groupname, filename));
+    double sc = photoManager->getScore(groupname, filename);
+    if(sc == -1){
+        qDebug()<< "Error in :server::ServerManager::judgePhoto, server can't find the photo";
+        sc = 0;
+    }
+    scores.append(sc);
     for(QList<QString>::iterator iter = users.begin(); iter != users.end(); ++iter){
         myServer->UpdatePoints((*iter), 1, photonums, groupnames, photonames, scores);
     }
@@ -126,15 +139,15 @@ bool server::ServerManager::unJudgePhoto (server::Date date , QString userID , Q
 //}
 
 const QImage *server::ServerManager::responseWithFullImage (QString username , QString groupname , QString filename) {
-    //todo get func
     const QImage* image = photoManager->getImage(groupname , filename , server::FullImage);
     QList<qint32> photonums;    photonums.append(1);
     QList<QString> groupnames, photonames;
     QList<QSize> sizes; sizes.append(image->size());
     QList<double> scores;   scores.append(photoManager->getScore(groupname, filename));
+    QList<QImage> images;   images.append(*image);
     groupnames.append(groupname);
     photonames.append(filename);
-    myServer->PassAllPhotos(username, 1, photonums, groupnames, *image, sizes, photonames, scores);
+    myServer->PassAllPhotos(username, 1, photonums, groupnames, images, sizes, photonames, scores);
     delete image;
     return NULL;
 }
@@ -157,30 +170,52 @@ void server::ServerManager::initWithSettings () {
 }
 
 void server::ServerManager::parseData (dyh::User *userData) {
+    qDebug()<<"server::ServerManager::parseData(), received signal";
     QDate date = userData->_datetime.date();
     QTime time = userData->_datetime.time();
     Date tempDate(date.year(), date.month(), date.day(), time.hour(), time.minute(), time.second());
-//    QString
+
     switch (userData->_clienttype)
     {
-        case dyh::LOGIN:
-            this->login(tempDate, userData->_username, userData.);
+        case dyh::LOGIN: {
+            QList<QString> gnames, fnames;
+            for(QList<dyh::Group>::iterator i = userData->_groups.begin(); i != userData->_groups.end(); ++i){
+                gnames.append(i->_date);
+                for(QList<dyh::Photo>::iterator j = i->_photos.begin(); j != i->_photos.end(); ++j){
+                    fnames.append(j->_title);
+                }
+            }
+            this->login(tempDate , userData->_username , gnames , fnames);
             break;
-        case dyh::LOGOUT:
-            this->logout(tempDate, userData->_username);
+        }
+        case dyh::LOGOUT: {
+            this->logout(tempDate , userData->_username);
             break;
-        case dyh::FORBIG:
-            this->responseWithFullImage(userData->_username, groupname, filename);
+        }
+        case dyh::FORBIG: {
+            QString groupname = userData->_groups.at(0)._date;
+            QString filename = userData->_groups.at(0)._photos.at(0)._title;
+            this->responseWithFullImage(userData->_username , groupname , filename);
             break;
-        case dyh::ADD;
-            this->uploadPhoto(tempDate, userData->_username, groupname, filename, image);
+        }
+        case dyh::ADD: {
+            QString groupname = userData->_groups.at(0)._date;
+            QString filename = userData->_groups.at(0)._photos.at(0)._title;
+            QImage image = userData->_groups.at(0)._photos.at(0)._photo;
+            this->uploadPhoto(tempDate , userData->_username , groupname , filename , &image);
             break;
-        case dyh::EVAL:
-            this->judgePhoto(tempDate, userData->_username, groupname, filename, score);
+        }
+        case dyh::EVAL: {
+            QString groupname = userData->_groups.at(0)._date;
+            QString filename = userData->_groups.at(0)._photos.at(0)._title;
+            int score = userData->_groups.at(0)._photos.at(0)._points;
+            this->judgePhoto(tempDate , userData->_username , groupname , filename , score);
             break;
-        case dyh::FORLOG:
+        }
+        case dyh::FORLOG: {
             this->queryLog(userData->_username);
             break;
+        }
         default:;
     }
     delete userData;
