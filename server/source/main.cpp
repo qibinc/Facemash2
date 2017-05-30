@@ -6,11 +6,27 @@
 #include <QtWidgets>
 #include <include/ServerManager.h>
 #include <QDateTime>
+#include <QtNetwork/QNetworkInterface>
+
 using namespace std;
 int main(int argc, char* argv[])
 {
 //    server::PhotoManager photoManager;
 //    server::UserManager userManager;
+    QString ipAddress;
+    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
+
+    for (int i = 0; i < ipAddressesList.size(); ++i)
+        if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
+            ipAddressesList.at(i).toIPv4Address() && ipAddressesList.at(i).toString().contains("10"))
+        {
+            ipAddress = ipAddressesList.at(i).toString();
+            break;
+        }
+    // if we did not find one, use IPv4 localhost
+    if (ipAddress.isEmpty())
+        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
+    qDebug()<<ipAddress;
     QApplication a(argc, argv);
     server::ServerManager serverManager;
     cout << "server Launched" << endl;
@@ -44,14 +60,6 @@ int main(int argc, char* argv[])
 //    serverManager.logout(date, user);
 //    serverManager.logout(date, user2);
 
-
-//    QLabel* label = new QLabel("test server",0);
-//    QPixmap mp = QPixmap::fromImage((*images).at(0));
-//    label->resize(1200,1200);
-//    label->setPixmap(mp);
-//    label->setScaledContents(false);
-//    label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored);
-//    label->show();
     return a.exec();
 	return 0;
 }

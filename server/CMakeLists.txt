@@ -11,7 +11,7 @@ if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 endif()
 
 include_directories(include libs/include)
-set(SOURCE_FILES source/main.cpp source/PhotoManager.cpp source/Photo.cpp source/User.cpp source/UserManager.cpp source/ServerManager.cpp libs/tcp/data.cpp libs/tcp/myserver.cpp include/ServerManager.h include/UserManager.h include/PhotoManager.h include/User.h include/Photo.h libs/include/data.h libs/include/myserver.h)
+set(SOURCE_FILES source/main.cpp source/PhotoManager.cpp source/Photo.cpp source/User.cpp source/UserManager.cpp source/ServerManager.cpp libs/tcp/data.cpp libs/tcp/myserver.cpp include/ServerManager.h include/UserManager.h include/PhotoManager.h include/User.h include/Photo.h libs/include/data.h libs/include/myserver.h include/ServerManager.h)
 
 add_executable(Server ${SOURCE_FILES})
 

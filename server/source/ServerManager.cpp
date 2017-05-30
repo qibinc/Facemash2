@@ -4,6 +4,7 @@
 
 #include "ServerManager.h"
 #include "Photo.h"
+#include <QDir>
 
 namespace server {
 
@@ -35,21 +36,15 @@ UserStatus server::ServerManager::login (server::Date date , QString UserID , QL
             imagenames.append(groups->at(i).getNames());
             scores.append(groups->at(i).getScores());
         }
-        qDebug()<<UserID;
-        qDebug()<<groupnum;
-        qDebug()<<photonums;
-        qDebug()<<groupnames;
-        qDebug()<<images;
-        qDebug()<<sizes;
-        qDebug()<<imagenames;
-        qDebug()<<scores;
+        qDebug()<<"server::ServerManager::login, user is:" + UserID;
+        qDebug()<<"server::ServerManager::login, return groups num is:" + groupnum;
 
         myServer->PassAllPhotos(UserID, groupnum, photonums, groupnames, images, sizes, imagenames, scores);
         delete groups;
         return succeed;
     }
     else {
-        qDebug()<<"is online";
+        qDebug()<<"server::ServerManager::login, "<<UserID<< "is online";
     }
     return wrongPW;
 }
@@ -72,7 +67,10 @@ QList<QString> server::ServerManager::queryLog (QString userID) {
 bool server::ServerManager::uploadPhoto (server::Date date , QString userID , QString groupname , QString filename , QImage *image) {
     if(userManager->upload(date, userID, filename)){
         photoManager->addPhoto(groupname , filename , image);
-        if(image->save(filename, 0)){
+        if(!QDir("server" + groupname+"/").exists()){
+            QDir().mkdir("server" + groupname + "/");
+        }
+        if(image->save("server" + groupname + '/' + filename, 0)){
             qDebug()<<"save " + groupname + "-" + filename + " successful";
         }
         else {
@@ -106,7 +104,12 @@ bool server::ServerManager::judgePhoto (server::Date date , QString userID , QSt
     QList<QString> groupnames, photonames;
     groupnames.append(groupname);   photonames.append(filename);
     QList<double> scores;
-    scores.append(photoManager->getScore(groupname, filename));
+    double sc = photoManager->getScore(groupname, filename);
+    if(sc == -1){
+        qDebug()<< "Error in :server::ServerManager::judgePhoto, server can't find the photo";
+        sc = 0;
+    }
+    scores.append(sc);
     for(QList<QString>::iterator iter = users.begin(); iter != users.end(); ++iter){
         myServer->UpdatePoints((*iter), 1, photonums, groupnames, photonames, scores);
     }
@@ -167,7 +170,7 @@ void server::ServerManager::initWithSettings () {
 }
 
 void server::ServerManager::parseData (dyh::User *userData) {
-    qDebug()<<"server::received signal";
+    qDebug()<<"server::ServerManager::parseData(), received signal";
     QDate date = userData->_datetime.date();
     QTime time = userData->_datetime.time();
     Date tempDate(date.year(), date.month(), date.day(), time.hour(), time.minute(), time.second());

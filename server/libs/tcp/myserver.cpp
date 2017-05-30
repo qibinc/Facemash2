@@ -1,4 +1,6 @@
 #include "myserver.h"
+
+
 namespace dyh
 {
 MyServer::MyServer(QObject *parent):
@@ -48,6 +50,11 @@ void MyServer::KeepMessage()
         inArray.append(socket->readAll());
         //LocalFile->write(inArray);
         //inArray.resize(0);
+        qDebug()<<"dyh::MyServer::KeepMessage received "<<BytesReceived << totalBytes;
+        if(BytesReceived > totalBytes){
+            totalBytes = 0;
+            BytesReceived = 0;//discard this message.
+        }
         if(BytesReceived == totalBytes)
         {
             //LocalFile->close();
@@ -79,6 +86,9 @@ void MyServer::KeepMessage()
             }
             else if(user->_clienttype == LOGOUT)
             {
+                qDebug()<<"dyh::MyServer::KeepMessage user logout";
+                socket->disconnectFromHost();
+                socket->waitForDisconnected();
                 _map.remove(user->_username);
                 emit GetMessageFromClient(user);
             }
@@ -141,12 +151,15 @@ void MyServer::SendPoints()
 
 void MyServer::PassAllPhotos(const QString& username, qint32 groupnum, const QList<qint32> &photonums, const QList<QString> &dates, const QList<QImage> &images, const QList<QSize> &sizes, const QList<QString> &titles, const QList<double> &points)
 {
-    qDebug()<<"pass photos!";
-    qDebug()<<photonums.size();
+    qDebug()<<"dyh::MyServer::PassAllPhotos: pass photos!";
+    qDebug()<<"photo groups' total num is "<<photonums.size();
     //qDebug()<<filepaths.size();
+    if(titles.size()>0){
+        qDebug()<<"photo titles' are ";
+    }
     for(int i = 0; i < titles.size(); i++)
     {
-        qDebug()<<titles.at(i);
+        qDebug() << titles.at(i);
     }
 
     QTcpSocket *socket = _map.value(username);
@@ -184,15 +197,15 @@ void MyServer::PassAllPhotos(const QString& username, qint32 groupnum, const QLi
     out<<user;
     out.device()->seek(0);
     out<<(qint64)(BtArray.size() - sizeof(qint64));
-    qDebug()<<BtArray.size();
+    qDebug()<<"BtArray's size is "<<BtArray.size();
     qint64 _size = socket->write(BtArray);
 
-    qDebug()<<_size;
+    qDebug()<<"write bytes num is "<<_size;
 }
 
 void MyServer::PassUserLog(const QString &username, const QString &log)
 {
-    qDebug()<<"Pass User Log!";
+    qDebug()<<"dyh::MyServer::PassUserLog: Pass User Log!";
     QTcpSocket *socket = _map.value(username);
     User user;
     user._username = username;
@@ -206,16 +219,16 @@ void MyServer::PassUserLog(const QString &username, const QString &log)
     out<<user;
     out.device()->seek(0);
     out<<(qint64)(BtArray.size() - sizeof(qint64));
-    qDebug()<<BtArray.size();
+    qDebug()<<"BtArray's size is "<<BtArray.size();
     qint64 _size = socket->write(BtArray);
     socket->waitForBytesWritten();
-    qDebug()<<_size;
+    qDebug()<<"write bytes num is "<<_size;
 }
 
 
 void MyServer::UpdatePoints(const QString& username, qint32 groupnum, const QList<qint32> &photonums, const QList<QString> &dates, const QList<QString> &titles, const QList<double> &points)
 {
-    qDebug()<<"Update Points!";
+    qDebug()<<"dyh::MyServer::UpdatePoints: Update Points!";
 
     QTcpSocket *socket = _map.value(username);
 
@@ -245,9 +258,9 @@ void MyServer::UpdatePoints(const QString& username, qint32 groupnum, const QLis
     out<<user;
     out.device()->seek(0);
     out<<(qint64)(BtArray.size() - sizeof(qint64));
-    qDebug()<<BtArray.size();
+    qDebug()<<"BtArray's size is "<<BtArray.size();
     qint64 _size = socket->write(BtArray);
     socket->waitForBytesWritten();
-    qDebug()<<_size;
+    qDebug()<<"write bytes num is "<<_size;
 }
 }
