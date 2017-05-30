@@ -14,35 +14,35 @@ int main(int argc, char* argv[])
     QApplication a(argc, argv);
     server::ServerManager serverManager;
     cout << "server Launched" << endl;
-    server::Date date;
-
-    QString file("star.png");
-    QImage *image = new QImage(file);
-    QString user("ivanium"), user2("qqq");
-    serverManager.login(date , user , QList<QString>() , QList<QString>());
-    serverManager.login(date , user , QList<QString>() , QList<QString>());
-
-    dyh::User data;
-    dyh::Group g;
-    dyh::Photo p;
-    p._points = 2.50;
-    p._title = "star.png";
-    p._photo = QImage(file);
-    p._size = p._photo.size();
-    g._date = "2017.5.32";
-    g._photonum = 1;
-    g._photos.append(p);
-
-    data._groups.append(g);
-    data._username = "ivanium";
-    data._clienttype = dyh::ADD;
-    data._groupnum = 1;
-    data._datetime = QDateTime::currentDateTime();
-    serverManager.parseData(&data);
-    serverManager.logout(date, user);
-
-    serverManager.logout(date, user);
-    serverManager.logout(date, user2);
+//    server::Date date;
+//
+//    QString file("star.png");
+//    QImage *image = new QImage(file);
+//    QString user("ivanium"), user2("qqq");
+//    serverManager.login(date , user , QList<QString>() , QList<QString>());
+//    serverManager.login(date , user , QList<QString>() , QList<QString>());
+//
+//    dyh::User data;
+//    dyh::Group g;
+//    dyh::Photo p;
+//    p._points = 2.50;
+//    p._title = "star.png";
+//    p._photo = QImage(file);
+//    p._size = p._photo.size();
+//    g._date = "2017.5.32";
+//    g._photonum = 1;
+//    g._photos.append(p);
+//
+//    data._groups.append(g);
+//    data._username = "ivanium";
+//    data._clienttype = dyh::ADD;
+//    data._groupnum = 1;
+//    data._datetime = QDateTime::currentDateTime();
+//    serverManager.parseData(&data);
+//    serverManager.logout(date, user);
+//
+//    serverManager.logout(date, user);
+//    serverManager.logout(date, user2);
 
 
 //    QLabel* label = new QLabel("test server",0);

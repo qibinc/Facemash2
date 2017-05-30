@@ -101,7 +101,6 @@ bool server::ServerManager::uploadPhoto (server::Date date , QString userID , QS
 bool server::ServerManager::judgePhoto (server::Date date , QString userID , QString groupname , QString filename , int score) {
     photoManager->addScoreToPhoto(groupname , filename , score , true);
     userManager->judgePhoto(date, userID, filename);
-    //todo get the func
     QList<QString> users = userManager->searchOnlineUsers();
     QList<qint32> photonums;    photonums.append(1);
     QList<QString> groupnames, photonames;
@@ -173,39 +172,47 @@ void server::ServerManager::parseData (dyh::User *userData) {
     QTime time = userData->_datetime.time();
     Date tempDate(date.year(), date.month(), date.day(), time.hour(), time.minute(), time.second());
 
-    QString groupname = userData->_groups.at(0)._date;
-    QString filename = userData->_groups.at(0)._photos.at(0)._title;
-    QImage image = userData->_groups.at(0)._photos.at(0)._photo;
-    int score = userData->_groups.at(0)._photos.at(0)._points;
-
-    QList<QString> gnames, fnames;
-    for(QList<dyh::Group>::iterator i = userData->_groups.begin(); i != userData->_groups.end(); ++i){
-        gnames.append(i->_date);
-        for(QList<dyh::Photo>::iterator j = i->_photos.begin(); j != i->_photos.end(); ++j){
-            fnames.append(j->_title);
-        }
-    }
-
     switch (userData->_clienttype)
     {
-        case dyh::LOGIN:
-            this->login(tempDate, userData->_username, gnames, fnames);
+        case dyh::LOGIN: {
+            QList<QString> gnames, fnames;
+            for(QList<dyh::Group>::iterator i = userData->_groups.begin(); i != userData->_groups.end(); ++i){
+                gnames.append(i->_date);
+                for(QList<dyh::Photo>::iterator j = i->_photos.begin(); j != i->_photos.end(); ++j){
+                    fnames.append(j->_title);
+                }
+            }
+            this->login(tempDate , userData->_username , gnames , fnames);
             break;
-        case dyh::LOGOUT:
-            this->logout(tempDate, userData->_username);
+        }
+        case dyh::LOGOUT: {
+            this->logout(tempDate , userData->_username);
             break;
-        case dyh::FORBIG:
-            this->responseWithFullImage(userData->_username, groupname, filename);
+        }
+        case dyh::FORBIG: {
+            QString groupname = userData->_groups.at(0)._date;
+            QString filename = userData->_groups.at(0)._photos.at(0)._title;
+            this->responseWithFullImage(userData->_username , groupname , filename);
             break;
-        case dyh::ADD:
-            this->uploadPhoto(tempDate, userData->_username, groupname, filename, &image);
+        }
+        case dyh::ADD: {
+            QString groupname = userData->_groups.at(0)._date;
+            QString filename = userData->_groups.at(0)._photos.at(0)._title;
+            QImage image = userData->_groups.at(0)._photos.at(0)._photo;
+            this->uploadPhoto(tempDate , userData->_username , groupname , filename , &image);
             break;
-        case dyh::EVAL:
-            this->judgePhoto(tempDate, userData->_username, groupname, filename, score);
+        }
+        case dyh::EVAL: {
+            QString groupname = userData->_groups.at(0)._date;
+            QString filename = userData->_groups.at(0)._photos.at(0)._title;
+            int score = userData->_groups.at(0)._photos.at(0)._points;
+            this->judgePhoto(tempDate , userData->_username , groupname , filename , score);
             break;
-        case dyh::FORLOG:
+        }
+        case dyh::FORLOG: {
             this->queryLog(userData->_username);
             break;
+        }
         default:;
     }
     delete userData;

@@ -82,6 +82,9 @@ void MyServer::KeepMessage()
                 _map.remove(user->_username);
                 emit GetMessageFromClient(user);
             }
+            else{
+                emit GetMessageFromClient(user);
+            }
         }
     }
 }
@@ -152,6 +155,7 @@ void MyServer::PassAllPhotos(const QString& username, qint32 groupnum, const QLi
     //user._groupnum = photonums.size();
     user._groupnum = groupnum;
     user._servertype = PHOTOS;
+
     for(int i = 0, k = 0; i < user._groupnum; i++)
     {
         Group group;
@@ -182,7 +186,7 @@ void MyServer::PassAllPhotos(const QString& username, qint32 groupnum, const QLi
     out<<(qint64)(BtArray.size() - sizeof(qint64));
     qDebug()<<BtArray.size();
     qint64 _size = socket->write(BtArray);
-    socket->waitForBytesWritten();
+
     qDebug()<<_size;
 }
 
