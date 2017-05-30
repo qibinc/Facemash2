@@ -155,11 +155,11 @@ const double PhotoManager::getScore (QString groupname , QString filename) {
         if(iter->getGroupName() == groupname){
             for(QList<Photo>::const_iterator i = iter->getAlbum().begin(); i != iter->getAlbum().end(); ++i){
                 if (i->getFileName() == filename){
-                    return (double)(i->getTotalScore())/(i->getTotalJudge());
+                    return i->getTotalJudge() == 0 ? 0 : (double)(i->getTotalScore())/(i->getTotalJudge());
                 }
             }
         }
     }
-    return -1;
+    return 0;
 }
 }

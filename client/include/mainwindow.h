@@ -27,7 +27,7 @@ private:
 	QHBoxLayout *mainLayout;
 	QScrollArea *controlArea, *photoArea;
 	QGroupBox *photoSetsBox;
-	QPushButton *loginPhotoButton, *addPhotoButton, *manualRefreshButton;
+	QPushButton *loginPhotoButton, *streamButton, *addPhotoButton, *manualRefreshButton;
 //  Controller
 	clientnetwork::MyClient *clientNetwork;
 	PhotoSetsController *photoSetsController;

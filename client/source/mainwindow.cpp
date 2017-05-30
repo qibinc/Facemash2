@@ -33,6 +33,7 @@ MainWindow::~MainWindow()
 {
 	clientNetwork->LogOut();
 	clientNetwork->deleteLater();
+	photostream->terminate();
 	delete centralWidget;
 }
 
@@ -99,6 +100,11 @@ void MainWindow::InitButtons()
 	layout->addWidget(loginPhotoButton, 0, Qt::AlignTop);
 	loginPhotoButton->setDisabled(true);
 
+	streamButton = new QPushButton("Wechat", this);
+	connect(streamButton, SIGNAL(clicked()), this, SLOT(TurnOnPhotoStream()));
+	layout->addWidget(streamButton, 0, Qt::AlignTop);
+	streamButton->setDisabled(true);
+
 	addPhotoButton = new QPushButton("Add Photo", this);
 	connect(addPhotoButton, SIGNAL(clicked()), photoSetsController, SLOT(NewPhoto()));
 	layout->addWidget(addPhotoButton, 0, Qt::AlignTop);
@@ -130,6 +136,7 @@ void MainWindow::RefreshPhotos()
 void MainWindow::TurnOnPhotoStream()
 {
 	std::cout << "Wechat Photo Stream ON" << std::endl;
+	streamButton->setDisabled(true);
 	streamtimer->start();
 	photostream->start();
 }
@@ -138,9 +145,9 @@ void MainWindow::LogIn()
 {
 	clientNetwork->LogIn("facemash2_test");
 	loginPhotoButton->setDisabled(true);
+	streamButton->setDisabled(false);
 	addPhotoButton->setDisabled(false);
 	manualRefreshButton->setDisabled(false);
-	TurnOnPhotoStream();
 }
 
 void MainWindow::RefreshComplete(QGroupBox *newPhotoSetsBox)

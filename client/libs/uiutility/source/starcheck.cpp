@@ -19,8 +19,8 @@ StarCheck::StarCheck(int score, int photoID, QWidget *parent) : QWidget(parent),
 		connect(stars[i], SIGNAL(stateChanged(int, int)), this, SLOT(Stared(int, int)));
 	}
 	setLayout(layout);
-
-	record = 0;
+//	Show the Existing Score
+	Stared(-1, StarCheckBox::LEAVE);
 }
 
 void StarCheck::Stared(int id, int state)
