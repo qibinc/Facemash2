@@ -158,7 +158,7 @@ void MainWindow::RefreshComplete(QGroupBox *newPhotoSetsBox)
 	photoSetsBox = newPhotoSetsBox;
 
 	photoArea->setWidget(photoSetsBox);
-	photoArea->verticalScrollBar()->setValue(photoArea->verticalScrollBar()->maximum());
+//	photoArea->verticalScrollBar()->setValue(photoArea->verticalScrollBar()->maximum());
 }
 
 void MainWindow::EnableLogIn()

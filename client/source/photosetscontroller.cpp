@@ -99,7 +99,7 @@ void PhotoSetsController::CopyPhotoFile()
 {
 	if (0 <= selectedSetID && selectedSetID < photoSetFiles.size()
 			&& 0 <= selectedPhotoID && selectedPhotoID < photoSetFiles.value(selectedSetID).size())
-		QApplication::clipboard()->setPixmap(QPixmap(photoSetFiles[selectedSetID][selectedPhotoID]));
+		QApplication::clipboard()->setPixmap(*localfilemanager::OpenImage(photoSetFiles[selectedSetID][selectedPhotoID]));
 }
 
 void PhotoSetsController::DeletePhotoFile()
