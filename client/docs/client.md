@@ -1,23 +1,34 @@
+<!--
+Created by Qibin Chen on 22/05/2017.
+-->
+
 Documentation - Client
 ================
 
 *   [Overview](#overview)
-*   [Elements](#elements)
+*   [Classes](#classes)
     *   [MainWindow](#mainwindow)
     *   [PhotoSet](#photoset)
     *   [PhotoSetsController](#photosetscontroller)
 *   [Libraries](#libraries)
-    *   [UIUtility](#uiutility)
+    *   [PhotoStream](#photostream)
+    *   [ClientNetwork](#clientnetwork)
+    *   [UiUtility](#uiutility)
+    *   [LocalFileManager](#localfilemanager)
 
 ---
 
 <h2 id="overview">Overview</h2>
 
-*   This is the desktop version of Facemash2.
+*   This is the desktop version of Facemash2_client.
+*   Package diagram
+![](client_package_diagram.png)
+*   Class diagram
+![](client_class_diagram.png)
 
 ---
 
-<h2 id="elements">Elements</h2>
+<h2 id="classes">Classes</h2>
 
 
 <h3 id="mainwindow">MainWindow</h3>
@@ -131,43 +142,10 @@ Documentation - Client
 
 <h2 id="libraries">Libraries</h2>
 
+* <a id="photostream" href="../libs/photostream/docs/photostream.md" title="PhotoStream Documentation">PhotoStream</a>
 
-<h3 id="uiutility">UIUtility</h3>
+* <a id="clientnetwork" href="../libs/clientnetwork/docs/clientnetwork.md" title="ClientNetwork Documentation">ClientNetwork</a>
 
-#### WidgetSize
+* <a id="uiutility" href="../libs/uiutility/docs/uiutility.md" title="UiUtility Documentation">UiUtility</a>
 
-*   Size Definitions of some frequently used ui components can be found here.  
-
-#### ClickableLabel
-
-*   Label that is clickable.
-
-#### PhotoLabel
-
-*   Label that displays a photo and clickable.
-
-##### protected:
-
-*   mouseEvents
-    *   ```c++
-        virtual void mousePressEvent(QMouseEvent* event) override;
-    
-        virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
-        ```
-    
-##### public:
-*   PhotoLabel
-    *   ```c++
-        PhotoLabel(int photoID, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
-        ```
-##### signals:
-
-*   clicked
-    *   ```c++
-        void clicked(int id);
-        
-        void rightClicked(int id);
-        
-        void doubleClicked(int id);
-        ```
-        
+* <a id="localfilemanager" href="../libs/localfilemanager/docs/localfilemanager.md" title="LocalFileManager Documentation">LocalFileManager</a>

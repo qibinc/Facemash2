@@ -4,6 +4,7 @@
 *   [Installation](#installation)
 *   [Documentation](#documentation)
 *   [Demo](#demo)
+
 <h2 id="features">Features</h2>
 
 * 实现照片展现、存储
@@ -30,7 +31,21 @@
 
 <h2 id="documentation">Documentation</h2>
 
-*   <a href="/client/docs/Documentation-Client.md" title="Client Documentation">Client</a>
+### Apps
+
+* <a href="server/serverDoc.md" title="Server Documentation">Server</a>
+
+* <a href="client/docs/client.md" title="Client Documentation">Client</a>
+
+### Libraries
+
+* <a href="client/libs/photostream/docs/photostream.md" title="PhotoStream Documentation">PhotoStream</a>
+
+* <a href="client/libs/clientnetwork/docs/clientnetwork.md" title="ClientNetwork Documentation">ClientNetwork</a>
+
+* <a href="client/libs/uiutility/docs/uiutility.md" title="UiUtility Documentation">UiUtility</a>
+
+* <a href="client/libs/localfilemanager/docs/localfilemanager.md" title="LocalFileManager Documentation">LocalFileManager</a>
 
 <h2 id="demo">Demo</h2>
 
