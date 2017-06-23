@@ -12,5 +12,5 @@ def download_files(msg):
     msg['Text'](filename)
     # itchat.send('@%s@%s' % ({'Picture': 'img', 'Video': 'vid'}.get(msg['Type'], 'fil'), filename), toUserName='filehelper')
 
-itchat.auto_login(True)
+itchat.auto_login()
 itchat.run()
