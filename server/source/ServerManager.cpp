@@ -1,6 +1,9 @@
-//
-// Created by ivanium on 2017/5/24.
-//
+//Name : ServerManager.cpp
+//Author: qiao yifan
+//Date : 2017-05-24
+//Description : Main part of the server
+//Copyright : Using QT to implement the Tcp connection and using some data structs such as QString etc. The other part is finished by qiao yifan. To make the description simpler and shorter, I won't declare QT's using in the project server while I use it almost every single file.
+
 
 #include "ServerManager.h"
 #include "Photo.h"

@@ -1,6 +1,8 @@
-//
-// Created by ivanium on 2017/5/24.
-//
+//Name : ServerManager.h
+//Author: qiao yifan
+//Date : 2017-05-24
+//Description : Main part of the server
+//Copyright : Using QT to implement the Tcp connection and using some data structs such as QString etc. The other part is finished by qiao yifan. To make the description simpler and shorter, I won't declare QT's using in the project server while I use it almost every single file.
 
 #ifndef FACEMASH2_SERVERMANAGER_H
 #define FACEMASH2_SERVERMANAGER_H
@@ -12,9 +14,10 @@
 
 namespace server {
 
+// enum type of user status when user log in
 enum UserStatus{
     succeed,
-    IDCorrupt,
+    IDCorrupt, //user's ID is already signed
     wrongPW,
     isOnline
 };
@@ -22,7 +25,7 @@ enum UserStatus{
 class ServerManager : public QObject{
     Q_OBJECT
 private:
-    UserManager *userManager;
+    UserManager *userManager;   //sub managers' pointers to conbine different objects' features
     PhotoManager *photoManager;
     dyh::MyServer *myServer;
 public:
@@ -39,13 +42,16 @@ public:
         delete myServer;
     }
 
+    //Setters
     void setUserManager (UserManager *userManager);
-
     void setPhotoManager (PhotoManager *photoManager);
 
+    //todo 
+    //back up server settings and init server with settings, including users' information and photos' information
     void backUpSettings();
     void initWithSettings ();
 
+    //
     UserStatus signUp (Date date , QString userID , QString password = QString::null);
     UserStatus login (server::Date date , QString UserID , QList<QString> groupnames , QList<QString> filenames , QString password = "");
     UserStatus logout(Date date, QString UserID);
