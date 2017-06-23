@@ -17,23 +17,23 @@
 
 *   CMake, Qt, Python/itchat REQUIRED
 
-* How to compile
+*   How to compile
 
-    ```
-    cd path/to/Facemash2
-    mkdir build
-    cd build
-    cmake .. -DCMAKE_PREFIX_PATH=/path/to/qt/5.x -DPYTHON_INCLUDE_DIR=/path/to/python/2.7/include/ -DPYTHON_LIBRARIES=/path/to/python/2.7/lib/libpython2.7.dylib
-    make
-    ```
+      ```
+      cd path/to/Facemash2
+      mkdir build
+      cd build
+      cmake .. -DCMAKE_PREFIX_PATH=/path/to/qt/5.x -DPYTHON_INCLUDE_DIR=/path/to/python/2.7/include/ -DPYTHON_LIBRARIES=/path/to/python/2.7/lib/libpython2.7.dylib
+      make
+      ```
 
-* You will find the executables under the folder bin
+*   You will find the executables under the folder bin
 
 <h2 id="documentation">Documentation</h2>
 
 ### Apps
 
-* <a href="server/serverDoc.md" title="Server Documentation">Server</a>
+* <a href="server/documents/serverDoc.md" title="Server Documentation">Server</a>
 
 * <a href="client/docs/client.md" title="Client Documentation">Client</a>
 
