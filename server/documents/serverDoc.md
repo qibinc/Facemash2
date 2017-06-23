@@ -376,6 +376,6 @@ Public:
 
   sort the photos in the group by their scores and thus we can return the sorted results to clients.
 
-### [ServerNetWork](tcpconnection.md)
+### [ServerNetWork](TcpConnection.md)
 
 ​	This part is finished by 丁雨晖 and the details of this part can refer to his document.
