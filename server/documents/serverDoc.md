@@ -185,20 +185,20 @@ Public:
 * add photos and scores
 
 
-  ```c++
+```c++
       void addPhoto (QString groupname , QString filename , QImage *image);
       void addScoreToPhoto (QString groupname , QString filename , int score , bool isJudging);
-  ```
+```
 
   The photo will be located uniquely by its group name and filename.
 
 *  get photos and scores
 
-  ```c++
+```c++
       const QImage *getImage (QString groupname , QString filename , ImageType type);
       const QList<SimpleGroup> *getImages (QList<QString> groupnames , QList<QString> filenames , ImageType type);
       const double getScore(QString groupname, QString filename) ;
-  ```
+```
 
   Image type is a `enum` type and contains two type of images: `FullImage` and `Thumbnail`, the functions will return corresponding images or scores.
 
@@ -225,7 +225,7 @@ Private:
       UserLog _log;
   ```
 
-​	Private user data and only provide interfaces to the outsider classes to ensure the safety. Actually all of the classes are designed following this rule.
+  ​Private user data and only provide interfaces to the outsider classes to ensure the safety. Actually all of the classes are designed following this rule.
 
 Public:
 
@@ -234,6 +234,71 @@ Public:
 * login() / logout()
 * upload() / download()
 * judge() / unjudge()
+
+### Event
+
+Abstract
+
+* Basic module of user log, contains user's operations description
+
+Private:
+
+* data
+
+  ```c++
+      QString _userName; //user's name
+      Operation _opt;	//user's operation
+      QString _object;	//the object of the operation
+      Date _date;		//operation date
+  ```
+
+Public:
+
+* Constructor
+
+  ```c++
+  Event (Date date, QString userName, Operation opt = nullOperation, QString object = QString::null) :
+              _userName(userName), _opt(opt), _object(object), _date(date) {};
+  ```
+
+  The `Event` object should be created with full of the basic information so the only way to set its value is by the constructor.
+
+
+* Setter
+
+* convert to string
+
+  ```c++
+  const QString toQString () const;
+  ```
+
+  Convert the event object to QString to show it eaier.
+
+### Userlog
+
+Abstract
+
+* All of the user's events
+
+Private:
+
+* data
+
+  ```c++
+  QList<Event> log; 	//all log
+  ```
+
+Public:
+
+* Getter
+
+* add event
+
+  ```c++
+      void addEvent (Event *event);
+  ```
+
+  Add event with the address of an event. The event is stored in the QList  and it will copy the content of the *event so we won't worry about the wild pointer.
 
 ### Photo
 
@@ -311,6 +376,6 @@ Public:
 
   sort the photos in the group by their scores and thus we can return the sorted results to clients.
 
-### ServerNetWork
+### [ServerNetWork](tcpconnection.md)
 
 ​	This part is finished by 丁雨晖 and the details of this part can refer to his document.
