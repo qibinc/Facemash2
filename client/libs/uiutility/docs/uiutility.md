@@ -140,4 +140,4 @@ Documentation - UiUtility
 
 <h2 id="libraries">Libraries</h2>
 
-* <a id="localfilemanager" href="../libs/localfilemanager/docs/localfilemanager.md" title="LocalFileManager Documentation">LocalFileManager</a>
+* <a id="localfilemanager" href="../../localfilemanager/docs/localfilemanager.md" title="LocalFileManager Documentation">LocalFileManager</a>

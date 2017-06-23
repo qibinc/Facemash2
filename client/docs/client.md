@@ -195,7 +195,7 @@ Documentation - Client
 	 ```c++
 	 void NewPhoto()
 	 ```
-	 *		This will pop up a dialog asking for the new photo.
+    *   This will pop up a dialog asking for the new photo.
 
 <h3 id="streamdisplay">StreamDisplay</h3>
 
@@ -210,7 +210,7 @@ Documentation - Client
     ```c++
     StreamDisplay(QString from_dir = "wechat_photo_stream_temp/", QObject *parent = nullptr);
     ```
-	 *	  The folder of the stream photos.
+    *   The folder of the stream photos.
 
 ##### public slots:
 *	 Refresh
@@ -218,7 +218,7 @@ Documentation - Client
     ```c++
     void Refresh();
     ```
-    *	 This will search in the stream folder and present new photos.
+    *   This will search in the stream folder and present new photos.
 
 ---
 
