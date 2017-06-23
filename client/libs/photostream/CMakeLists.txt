@@ -16,18 +16,8 @@ if (NOT TARGET photostream)
     include_directories(${PYTHON_INCLUDE_DIR})
     target_link_libraries(photostream ${PYTHON_LIBRARIES})
 
-    add_subdirectory(libs/uiutility)
-    include_directories(libs/uiutility/include)
-    target_link_libraries(photostream uiutilitylib)
-
-    add_subdirectory(libs/localfilemanager)
-    include_directories(libs/localfilemanager/include)
-    target_link_libraries(photostream localfilemanager)
-
     add_executable(photostream_test ${SOURCE_FILES})
     qt5_use_modules(photostream_test Core Widgets Gui)
     target_link_libraries(photostream_test ${PYTHON_LIBRARIES})
-    target_link_libraries(photostream_test uiutilitylib)
-    target_link_libraries(photostream_test localfilemanager)
 
 endif()
